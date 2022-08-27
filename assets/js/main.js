@@ -256,3 +256,30 @@
 		}
 
 })(jQuery);
+
+// Items.
+$('.items')
+.scrollex({
+	top:		'30vh',
+	bottom:		'30vh',
+	delay:		50,
+	initialize:	function() {
+		$(this).addClass('is-inactive');
+	},
+	terminate:	function() {
+		$(this).removeClass('is-inactive');
+	},
+	enter:		function() {
+		$(this).removeClass('is-inactive');
+	},
+	leave:		function() {
+
+		var $this = $(this);
+
+		if ($this.hasClass('onscroll-bidirectional'))
+			$this.addClass('is-inactive');
+
+	}
+})
+.children()
+	.wrapInner('<div class="inner"></div>');
