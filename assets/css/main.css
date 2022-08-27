@@ -7251,3 +7251,10 @@ input, select, textarea {
 		border-color: rgba(0, 0, 0, 0.2);
 	}
 
+
+#profile_img{
+	border-radius: 50%;
+	width: 20%;
+  	height: auto;
+  	float: left;
+}
