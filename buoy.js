@@ -15,6 +15,7 @@ const buoyPositions = [
 ];
 
 const INTERACTION_DISTANCE = 40; // Much larger for easier interaction
+const CINEMATIC_DURATION = 1500; // Match main.js
 
 // Buoy GLB model cache
 let buoyModel = null;
@@ -221,7 +222,7 @@ export function initBuoys(scene, THREE) {
             context.font = 'Bold 20px Arial';
             context.fillStyle = '#cccccc';
             context.textAlign = 'center';
-            context.fillText(content.title, 128, 35);
+            context.fillText(buoyContent[index].title, 128, 35);
 
             const textTexture = new THREE.CanvasTexture(canvas);
             const textMaterial = new THREE.SpriteMaterial({
@@ -480,7 +481,7 @@ function updateBuoyState(buoy, distance, THREE) {
 }
 
 // Beautiful modal using SweetAlert2
-function showProjectModal(content) {
+function showProjectModal(content, switchToFollowMode) {
     Swal.fire({
         title: content.title,
         html: `
@@ -525,12 +526,18 @@ function showProjectModal(content) {
             popup: 'project-modal',
             title: 'modal-title',
             confirmButton: 'modal-close-btn'
+        },
+        didClose: () => {
+            // Switch back to follow mode when modal closes
+            if (switchToFollowMode) {
+                switchToFollowMode();
+            }
         }
     });
 }
 
 // Handle interaction (called when E key is pressed)
-export function interactWithBuoy(THREE, scene) {
+export function interactWithBuoy(THREE, scene, startCinematicCallback, switchToFollowModeCallback) {
     if (currentHighlightedBuoy) {
 
         // Mark as visited
@@ -549,8 +556,15 @@ export function interactWithBuoy(THREE, scene) {
             animateBuoyScale(currentHighlightedBuoy.userData.icon, 1.0, 400);
         }, 300);
 
-        // Show HTML modal with project details
-        showProjectModal(currentHighlightedBuoy.userData.content);
+        // Trigger cinematic camera transition
+        if (startCinematicCallback) {
+            startCinematicCallback(currentHighlightedBuoy);
+        }
+
+        // Show HTML modal with project details (delayed to sync with cinematic)
+        setTimeout(() => {
+            showProjectModal(currentHighlightedBuoy.userData.content, switchToFollowModeCallback);
+        }, CINEMATIC_DURATION * 0.7); // Show modal when camera is 70% through transition
 
         return true;
     }

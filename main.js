@@ -41,13 +41,224 @@ let bounceStartMs = 0;
 let bounceFromRadius = 0;
 const bounceDir = new THREE.Vector3();
 
+// Camera system
+const CAMERA_MODES = {
+    FOLLOW: 'follow',
+    ORBIT: 'orbit',
+    CINEMATIC: 'cinematic'
+};
+let currentCameraMode = CAMERA_MODES.FOLLOW;
+
+// Follow camera settings
+const FOLLOW_DISTANCE = 20;
+const FOLLOW_HEIGHT = 12;
+const FOLLOW_LAG = 0.15; // Very responsive following for turns
+const CAMERA_LAG_POSITION = 0.12; // Separate lag for position
+const CAMERA_LAG_TARGET = 0.08; // Separate lag for target
+const targetCameraPosition = new THREE.Vector3();
+const currentCameraTarget = new THREE.Vector3();
+
+// Cinematic camera settings
+const CINEMATIC_DURATION = 1500;
+let cinematicStartTime = 0;
+let cinematicStartPosition = new THREE.Vector3();
+let cinematicStartTarget = new THREE.Vector3();
+let cinematicEndPosition = new THREE.Vector3();
+let cinematicEndTarget = new THREE.Vector3();
+let isInCinematic = false;
+
 // Temp objects for angle logging
 const _tmpOffset = new THREE.Vector3();
 const _tmpSph = new THREE.Spherical();
 let _lastAngleLogMs = 0;
 
+// Camera control functions
+function updateFollowCamera(boatPosition, deltaTime) {
+    // Safety check: ensure boatPosition is defined
+    if (!boatPosition) return;
+
+    // Get boat's actual visual direction (considering wave rotation)
+    const boatDirection = new THREE.Vector3(0, 0, -1); // Default forward direction
+    if (boatGeometry) {
+        // Apply the boat's actual rotation to get its visual direction
+        boatDirection.applyQuaternion(boatGeometry.quaternion);
+        boatDirection.y = 0; // Keep on horizontal plane
+        boatDirection.normalize();
+    } else {
+        // Fallback to movement rotation if geometry not available
+        boatDirection.set(Math.sin(boatRotation), 0, Math.cos(boatRotation));
+    }
+
+    // Calculate right vector for proper camera positioning
+    const rightVector = new THREE.Vector3();
+    rightVector.crossVectors(boatDirection, new THREE.Vector3(0, 1, 0)).normalize();
+
+    // Position camera behind and slightly to the side of the boat for better view
+    targetCameraPosition.copy(boatPosition);
+    targetCameraPosition.addScaledVector(boatDirection, -FOLLOW_DISTANCE); // Behind
+    targetCameraPosition.addScaledVector(rightVector, 2); // Slightly to the right
+    targetCameraPosition.y += FOLLOW_HEIGHT;
+
+    // Calculate target look-at position (slightly ahead and above the boat)
+    currentCameraTarget.copy(boatPosition);
+    currentCameraTarget.addScaledVector(boatDirection, 8); // Further ahead for better anticipation
+    currentCameraTarget.y += 3; // Higher look-at point
+
+    // Use separate lag values for more responsive following
+    camera.position.lerp(targetCameraPosition, CAMERA_LAG_POSITION);
+    controls.target.lerp(currentCameraTarget, CAMERA_LAG_TARGET);
+
+    // Make camera look in the same direction as the boat
+    const lookTarget = new THREE.Vector3();
+    lookTarget.copy(boatPosition);
+    lookTarget.addScaledVector(boatDirection, 15); // Look 15 units ahead in boat's direction
+    lookTarget.y += 2; // Look slightly up
+
+    // Use lookAt to rotate camera towards the target point
+    camera.lookAt(lookTarget);
+
+    // Debug: Log camera and boat positions occasionally
+    if (Math.random() < 0.005) { // Log ~0.5% of frames
+        console.log('Camera:', camera.position, 'Target:', controls.target, 'Boat:', boatPosition, 'Direction:', boatDirection);
+    }
+}
+
+function startCinematicTransition(targetBuoy) {
+    if (isInCinematic) return;
+
+    isInCinematic = true;
+    currentCameraMode = CAMERA_MODES.CINEMATIC;
+    cinematicStartTime = performance.now();
+
+    // Store starting positions
+    cinematicStartPosition.copy(camera.position);
+    cinematicStartTarget.copy(controls.target);
+
+    // Calculate cinematic end position (close to buoy, elevated)
+    const buoyPos = targetBuoy.position;
+    cinematicEndPosition.copy(buoyPos);
+    cinematicEndPosition.add(new THREE.Vector3(8, 12, 8)); // Offset position
+
+    cinematicEndTarget.copy(buoyPos);
+    cinematicEndTarget.y += 5; // Look slightly above buoy
+}
+
+function updateCinematicCamera() {
+    if (!isInCinematic) return;
+
+    const elapsed = performance.now() - cinematicStartTime;
+    const progress = Math.min(elapsed / CINEMATIC_DURATION, 1);
+
+    // Smooth easing function
+    const easeProgress = 1 - Math.pow(1 - progress, 3); // Cubic ease out
+
+    // Interpolate camera position
+    camera.position.lerpVectors(cinematicStartPosition, cinematicEndPosition, easeProgress);
+
+    // Interpolate camera target
+    controls.target.lerpVectors(cinematicStartTarget, cinematicEndTarget, easeProgress);
+
+    // End cinematic when complete
+    if (progress >= 1) {
+        isInCinematic = false;
+        currentCameraMode = CAMERA_MODES.ORBIT; // Switch to orbit mode after cinematic
+    }
+}
+
+function switchCameraMode(mode) {
+    if (mode === CAMERA_MODES.FOLLOW) {
+        currentCameraMode = CAMERA_MODES.FOLLOW;
+        controls.enabled = false; // Disable orbit controls
+
+        // Safety check: ensure boatPosition is defined
+        if (!boatPosition) {
+            console.warn('Boat position not ready yet, deferring follow camera initialization');
+            return;
+        }
+
+        // Set initial follow camera position immediately
+        const boatDirection = new THREE.Vector3(0, 0, -1); // Default forward direction
+        if (boatGeometry) {
+            // Apply the boat's actual rotation to get its visual direction
+            boatDirection.applyQuaternion(boatGeometry.quaternion);
+            boatDirection.y = 0; // Keep on horizontal plane
+            boatDirection.normalize();
+        } else {
+            // Fallback to movement rotation if geometry not available
+            boatDirection.set(Math.sin(boatRotation), 0, Math.cos(boatRotation));
+        }
+
+        // Calculate right vector for proper camera positioning
+        const rightVector = new THREE.Vector3();
+        rightVector.crossVectors(boatDirection, new THREE.Vector3(0, 1, 0)).normalize();
+
+        // Position camera behind and slightly to the side of the boat
+        targetCameraPosition.copy(boatPosition);
+        targetCameraPosition.addScaledVector(boatDirection, -FOLLOW_DISTANCE);
+        targetCameraPosition.addScaledVector(rightVector, 2);
+        targetCameraPosition.y += FOLLOW_HEIGHT;
+
+        camera.position.copy(targetCameraPosition);
+
+        currentCameraTarget.copy(boatPosition);
+        currentCameraTarget.addScaledVector(boatDirection, 8);
+        currentCameraTarget.y += 3;
+
+        controls.target.copy(currentCameraTarget);
+
+        // Set initial camera rotation to match boat direction
+        const initialLookTarget = new THREE.Vector3();
+        initialLookTarget.copy(boatPosition);
+        initialLookTarget.addScaledVector(boatDirection, 15);
+        initialLookTarget.y += 2;
+
+        camera.lookAt(initialLookTarget);
+
+    } else if (mode === CAMERA_MODES.ORBIT) {
+        currentCameraMode = CAMERA_MODES.ORBIT;
+        controls.enabled = true; // Enable orbit controls
+        isInCinematic = false; // Cancel any ongoing cinematic
+    }
+}
+
+// Camera mode indicator
+const cameraModeIndicator = document.createElement('div');
+cameraModeIndicator.style.cssText = `
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #fff;
+    font-family: monospace;
+    font-size: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px 10px;
+    border-radius: 3px;
+    border: 1px solid #444;
+`;
+cameraModeIndicator.textContent = 'CAMERA: FOLLOW';
+document.body.appendChild(cameraModeIndicator);
+
+// Update camera mode indicator
+function updateCameraModeIndicator() {
+    let modeText = 'CAMERA: ';
+    if (isInCinematic) {
+        modeText += 'CINEMATIC';
+        cameraModeIndicator.style.background = 'rgba(100, 100, 150, 0.7)';
+    } else if (currentCameraMode === CAMERA_MODES.FOLLOW) {
+        modeText += 'FOLLOW';
+        cameraModeIndicator.style.background = 'rgba(0, 0, 0, 0.5)';
+    } else if (currentCameraMode === CAMERA_MODES.ORBIT) {
+        modeText += 'ORBIT';
+        cameraModeIndicator.style.background = 'rgba(0, 0, 0, 0.5)';
+    }
+    cameraModeIndicator.textContent = modeText;
+}
+
+// Set up initial camera position for orbit mode reference
 camera.position.set(18, 16, 24);
-// Set initial spherical angles: phi=76.2°, theta=37.2° (keep same radius)
+controls.target.set(0, 0, 0);
+
+// Set initial spherical angles for orbit controls
 {
 	const target = controls.target.clone();
 	const radius = camera.position.distanceTo(target);
@@ -58,7 +269,7 @@ camera.position.set(18, 16, 24);
 	);
 	camera.position.copy(new THREE.Vector3().setFromSpherical(sph).add(target));
 }
-camera.lookAt(0, 0, 0);
+camera.lookAt(controls.target);
 controls.update();
 
 // Point grid geometry
@@ -142,7 +353,7 @@ dots.rotation.x = 0;
 scene.add(dots);
 
 // Import and initialize boat system
-import { initBoat, updateBoat, boatPosition } from './boat.js';
+import { initBoat, updateBoat, boatPosition, boatRotation, boatGeometry } from './boat.js';
 import { initWaveSampling } from './wave-sampling.js';
 import { initBuoys, updateBuoys, interactWithBuoy, getCurrentHighlightedBuoy, updateTextSprites } from './buoy.js';
 
@@ -153,6 +364,9 @@ initWaveSampling(waveDirs, waveAmp, waveLen, waveSpeed, waveSteep, wavePhase);
 // Initialize boat
 const boat = initBoat(scene, THREE);
 
+// Initialize camera in follow mode (after boat is ready)
+switchCameraMode(CAMERA_MODES.FOLLOW);
+
 // Initialize buoys
 const buoySystem = initBuoys(scene, THREE);
 
@@ -160,7 +374,16 @@ const buoySystem = initBuoys(scene, THREE);
 document.addEventListener('keydown', (event) => {
 	if (event.code === 'KeyE') {
 		event.preventDefault();
-		interactWithBuoy(THREE, scene);
+		interactWithBuoy(THREE, scene, startCinematicTransition, () => switchCameraMode(CAMERA_MODES.FOLLOW));
+	}
+	if (event.code === 'KeyC') {
+		event.preventDefault();
+		// Toggle between follow and orbit camera modes
+		if (currentCameraMode === CAMERA_MODES.FOLLOW) {
+			switchCameraMode(CAMERA_MODES.ORBIT);
+		} else if (currentCameraMode === CAMERA_MODES.ORBIT && !isInCinematic) {
+			switchCameraMode(CAMERA_MODES.FOLLOW);
+		}
 	}
 	if (event.code === 'Escape') {
 		event.preventDefault();
@@ -174,8 +397,22 @@ function animate() {
 	// Update all animations
 	TWEEN.update();
 
+	// Update camera based on current mode
+	if (currentCameraMode === CAMERA_MODES.FOLLOW && !isInCinematic) {
+		updateFollowCamera(boatPosition, 0.02);
+	} else if (currentCameraMode === CAMERA_MODES.CINEMATIC || isInCinematic) {
+		updateCinematicCamera();
+	}
+
+	// Update camera mode indicator
+	updateCameraModeIndicator();
+
 	material.uniforms.uTime.value += 0.02;
-	controls.update();
+
+	// Only update orbit controls if in orbit mode
+	if (currentCameraMode === CAMERA_MODES.ORBIT && !isInCinematic) {
+		controls.update();
+	}
 
 	// Update boat
 	const time = material.uniforms.uTime.value;
