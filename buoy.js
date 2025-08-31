@@ -86,6 +86,49 @@ function stopPulseAnimation(icon) {
     }
 }
 
+function createInteractionRing(buoy) {
+    const ringGeometry = new THREE.RingGeometry(3.5, 4.5, 16);
+    const ringMaterial = new THREE.MeshBasicMaterial({
+        color: 0x888888,
+        transparent: true,
+        opacity: 0.6,
+        side: THREE.DoubleSide
+    });
+    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+    ring.position.set(0, 1, 0);
+    ring.rotation.x = -Math.PI / 2; // Lay flat on water surface
+
+    // Add pulsing animation to the ring
+    const pulseRing = () => {
+        new TWEEN.Tween({ scale: 1.0, opacity: 0.6 })
+            .to({ scale: 1.2, opacity: 0.3 }, 1500)
+            .easing(TWEEN.Easing.Sinusoidal.InOut)
+            .yoyo(true)
+            .repeat(Infinity)
+            .onUpdate(function(obj) {
+                ring.scale.setScalar(obj.scale);
+                ring.material.opacity = obj.opacity;
+            })
+            .start();
+    };
+
+    ring.userData.pulseAnimation = pulseRing();
+    return ring;
+}
+
+function removeInteractionRing(buoy) {
+    const ring = buoy.userData.interactionRing;
+    if (ring) {
+        if (ring.userData.pulseAnimation) {
+            ring.userData.pulseAnimation.stop();
+        }
+        buoy.remove(ring);
+        ring.geometry.dispose();
+        ring.material.dispose();
+        buoy.userData.interactionRing = null;
+    }
+}
+
 // Buoy content (placeholder data)
 const buoyContent = [
     {
@@ -164,10 +207,33 @@ export function initBuoys(scene, THREE) {
             const iconMaterial = new THREE.MeshBasicMaterial({
                 color: 0xcccccc, // Light gray for all projects initially
                 transparent: true,
-                opacity: 0.8
+                opacity: 0.9
             });
             const icon = new THREE.Mesh(iconGeometry, iconMaterial);
             icon.position.set(0, 8, 0); // Position above buoy
+
+            // Add project title text above the icon
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 256;
+            canvas.height = 64;
+
+            context.font = 'Bold 20px Arial';
+            context.fillStyle = '#cccccc';
+            context.textAlign = 'center';
+            context.fillText(content.title, 128, 35);
+
+            const textTexture = new THREE.CanvasTexture(canvas);
+            const textMaterial = new THREE.SpriteMaterial({
+                map: textTexture,
+                transparent: true,
+                opacity: 0.7
+            });
+            const textSprite = new THREE.Sprite(textMaterial);
+            textSprite.scale.set(4, 1, 1);
+            textSprite.position.set(0, 9.5, 0); // Position above icon
+
+            buoyGroup.add(textSprite);
 
             // Add bobbing animation
             const bobAnimation = new TWEEN.Tween({ y: 8 })
@@ -201,6 +267,8 @@ export function initBuoys(scene, THREE) {
                 glow: null, // Will be created dynamically
                 buoyMesh: buoyMesh,
                 icon: icon,
+                textSprite: textSprite,
+                interactionRing: null, // Will be created for interaction feedback
                 isGLB: true
             };
 
@@ -332,8 +400,9 @@ function updateBuoyState(buoy, distance, THREE) {
             // Animate to dark gray if not already
             if (buoy.userData.icon.material.color.getHex() !== 0x555555) {
                 animateBuoyColor(buoy.userData.icon, 0x555555, 600);
-                animateBuoyOpacity(buoy.userData.icon, 1.0, 400);
                 animateBuoyScale(buoy.userData.icon, 1.0, 500);
+                // Update text sprite color to dark gray
+                buoy.userData.textSprite.material.color.setHex(0x555555);
                 // Start pulsing animation for visited buoys
                 startPulseAnimation(buoy.userData.icon);
             }
@@ -346,8 +415,17 @@ function updateBuoyState(buoy, distance, THREE) {
 
                 // Animate icon to medium gray with scale up
                 animateBuoyColor(buoy.userData.icon, 0x888888, 400);
-                animateBuoyOpacity(buoy.userData.icon, 1.0, 300);
                 animateBuoyScale(buoy.userData.icon, 1.2, 400);
+
+                // Update text sprite color to medium gray
+                buoy.userData.textSprite.material.color.setHex(0x888888);
+
+                // Add interaction ring instead of changing opacity
+                if (!buoy.userData.interactionRing) {
+                    buoy.userData.interactionRing = createInteractionRing(buoy);
+                    buoy.add(buoy.userData.interactionRing);
+                }
+
                 // Start pulsing animation
                 startPulseAnimation(buoy.userData.icon);
             }
@@ -383,8 +461,14 @@ function updateBuoyState(buoy, distance, THREE) {
                 buoy.userData.state = 'idle';
                 // Animate back to default light gray
                 animateBuoyColor(buoy.userData.icon, 0xcccccc, 600);
-                animateBuoyOpacity(buoy.userData.icon, 0.8, 400);
                 animateBuoyScale(buoy.userData.icon, 1.0, 500);
+
+                // Reset text sprite color to light gray
+                buoy.userData.textSprite.material.color.setHex(0xcccccc);
+
+                // Remove interaction ring
+                removeInteractionRing(buoy);
+
                 // Stop pulsing animation
                 stopPulseAnimation(buoy.userData.icon);
             }
@@ -474,6 +558,15 @@ export function interactWithBuoy(THREE, scene) {
 }
 
 
+
+// Update text sprites to face camera
+export function updateTextSprites(camera) {
+    buoys.forEach(buoy => {
+        if (buoy.userData.textSprite) {
+            buoy.userData.textSprite.lookAt(camera.position);
+        }
+    });
+}
 
 // Get current highlighted buoy for UI feedback
 export function getCurrentHighlightedBuoy() {

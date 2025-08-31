@@ -144,7 +144,7 @@ scene.add(dots);
 // Import and initialize boat system
 import { initBoat, updateBoat, boatPosition } from './boat.js';
 import { initWaveSampling } from './wave-sampling.js';
-import { initBuoys, updateBuoys, interactWithBuoy, getCurrentHighlightedBuoy } from './buoy.js';
+import { initBuoys, updateBuoys, interactWithBuoy, getCurrentHighlightedBuoy, updateTextSprites } from './buoy.js';
 
 
 // Initialize wave sampling with our wave parameters
@@ -184,6 +184,9 @@ function animate() {
 
 	// Update buoys
 	updateBuoys(time, boatPosition, THREE, scene);
+
+	// Update text sprites to face camera
+	updateTextSprites(camera);
 
 	// HTML modal handles its own closing logic
 
