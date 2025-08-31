@@ -23,12 +23,13 @@ Interactive 3D ocean experience with:
 - **Limits**: Soft fog boundary with gentle push-back
 - **Features**: Async GLB loading, proper scaling/rotation, lighting
 
-## 3. Buoy System
+## 3. Buoy System ✅ COMPLETE
 - **Geometry**: Five cylindrical buoys at fixed world positions
-- **Placement**: Spread across ocean in interesting cluster
-- **Interaction**: Proximity detection (10-15 units), E key to open card
-- **Cards**: Floating UI planes with Problem/Timeline/Solution sections
-- **States**: Idle, highlighted (near), visited (glow effect)
+- **Placement**: Spread across ocean in interesting cluster (NE, NW, SE, SW, far N)
+- **Interaction**: Proximity detection (40 units), E key to open 3D modal
+- **Cards**: Large 3D modal planes (20×15) with Problem/Timeline/Solution sections
+- **States**: Idle (red), highlighted (green glow), visited (golden glow)
+- **Features**: Wave floating, proximity detection, auto-close modals, content system
 
 ## 4. Lighthouse System
 - **Geometry**: Tower + base + beam light

@@ -1,5 +1,6 @@
 // Wave sampling utilities for CPU-side Gerstner wave calculations
 // These match the shader parameters for consistent boat floating
+import * as THREE from 'three';
 
 // Wave parameters (should match main.js)
 let waveDirs, waveAmp, waveLen, waveSpeed, waveSteep, wavePhase;

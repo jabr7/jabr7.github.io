@@ -1,5 +1,7 @@
 // Boat system module
+import * as THREE from 'three';
 import { sampleWaveHeight } from './wave-sampling.js';
+import { GLTFLoader } from 'https://unpkg.com/three@0.167.1/examples/jsm/loaders/GLTFLoader.js';
 
 // Boat state
 export let boatPosition;
@@ -36,7 +38,7 @@ export function initBoat(scene, THREE) {
 	scene.add(boatGeometry);
 
 	// Load the GLB boat model
-	const loader = new THREE.GLTFLoader();
+	const loader = new GLTFLoader();
 	loader.load('./Boat.glb', (gltf) => {
 		// Remove placeholder
 		boatGeometry.remove(placeholder);

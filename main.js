@@ -1,4 +1,8 @@
+import * as THREE from 'three';
+import { OrbitControls } from 'https://unpkg.com/three@0.167.1/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from 'https://unpkg.com/three@0.167.1/examples/jsm/loaders/GLTFLoader.js';
 import { vertexShader, fragmentShader } from './shaders.js';
+import * as TWEEN from 'https://cdn.jsdelivr.net/npm/@tweenjs/tween.js@18.6.4/dist/tween.esm.js';
 
 // Scene
 const scene = new THREE.Scene();
@@ -7,8 +11,17 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+// Neutral monochromatic lighting
+const ambientLight = new THREE.AmbientLight(0x404040, 0.4); // Subtle ambient light
+scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight(0x808080, 0.6);
+directionalLight.position.set(10, 10, 5);
+directionalLight.castShadow = false; // Keep it simple
+scene.add(directionalLight);
+
 // Controls
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.enablePan = false;
@@ -133,6 +146,7 @@ import { initBoat, updateBoat, boatPosition } from './boat.js';
 import { initWaveSampling } from './wave-sampling.js';
 import { initBuoys, updateBuoys, interactWithBuoy, getCurrentHighlightedBuoy } from './buoy.js';
 
+
 // Initialize wave sampling with our wave parameters
 initWaveSampling(waveDirs, waveAmp, waveLen, waveSpeed, waveSteep, wavePhase);
 
@@ -142,8 +156,24 @@ const boat = initBoat(scene, THREE);
 // Initialize buoys
 const buoySystem = initBuoys(scene, THREE);
 
+// Handle E key for buoy interaction and Escape to close modals
+document.addEventListener('keydown', (event) => {
+	if (event.code === 'KeyE') {
+		event.preventDefault();
+		interactWithBuoy(THREE, scene);
+	}
+	if (event.code === 'Escape') {
+		event.preventDefault();
+		// Escape is now handled by the HTML modal itself
+	}
+});
+
 function animate() {
 	requestAnimationFrame(animate);
+
+	// Update all animations
+	TWEEN.update();
+
 	material.uniforms.uTime.value += 0.02;
 	controls.update();
 
@@ -153,7 +183,9 @@ function animate() {
 	updateBoat(time, amplitude, THREE);
 
 	// Update buoys
-	updateBuoys(time, boatPosition, THREE);
+	updateBuoys(time, boatPosition, THREE, scene);
+
+	// HTML modal handles its own closing logic
 
 	// Bounce-back when hitting the outer limit
 	const now = performance.now();
