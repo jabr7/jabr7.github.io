@@ -1,214 +1,263 @@
-// Modal system module
-import * as THREE from 'three';
-import { sampleWaveHeight } from './wave-sampling.js';
+// Modal system module - HTML modal functions
+export { showProjectModal, showControlsModal };
 
-// Modal state
-let activeModal = null;
+// Project details modal
+function showProjectModal(content, switchToFollowMode) {
+    // Create modal container
+    const modal = document.createElement('div');
+    modal.id = 'project-modal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        font-family: 'Arial', sans-serif;
+    `;
 
-// Create 3D text using high-quality canvas sprites
-function createTextMesh(text, options = {}) {
-	const canvas = document.createElement('canvas');
-	const context = canvas.getContext('2d');
+    // Create modal content
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: #1a1a1a;
+        border-radius: 12px;
+        padding: 30px;
+        max-width: 700px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        border: 2px solid #444;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        position: relative;
+        color: #fff;
+    `;
 
-	// High resolution for crisp text
-	canvas.width = 2048;
-	canvas.height = 1024;
+    // Content with close button at the bottom
+    const contentDiv = document.createElement('div');
+    contentDiv.innerHTML = `
+        <h1 style="color: #fff; margin-bottom: 20px; font-size: 1.8em; text-align: center;">${content.title}</h1>
+        <div style="margin-bottom: 15px;">
+            <h3 style="color: #888; margin-bottom: 5px; font-size: 1em;">PROBLEM</h3>
+            <p style="margin: 0; color: #ccc;">${content.problem}</p>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <h3 style="color: #888; margin-bottom: 5px; font-size: 1em;">TIMELINE</h3>
+            <p style="margin: 0; color: #fff; font-weight: bold;">${content.timeline}</p>
+        </div>
+        <div style="margin-bottom: 15px;">
+            <h3 style="color: #888; margin-bottom: 5px; font-size: 1em;">SOLUTION</h3>
+            <p style="margin: 0; color: #ccc;">${content.solution}</p>
+        </div>
+        <div style="margin-bottom: 25px;">
+            <h3 style="color: #888; margin-bottom: 5px; font-size: 1em;">TECHNOLOGIES</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                ${content.tags.map(tag => `<span style="background: #333; color: #888; padding: 3px 8px; border-radius: 10px; font-size: 0.8em;">${tag}</span>`).join('')}
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <button id="close-modal-btn" style="
+                background: #555;
+                color: #fff;
+                border: none;
+                padding: 15px 40px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 18px;
+                font-weight: bold;
+                transition: background 0.2s;
+                min-width: 120px;
+                min-height: 50px;
+                -webkit-tap-highlight-color: transparent;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            ">Close</button>
+        </div>
+    `;
 
-	// Setup text rendering
-	context.font = `Bold ${options.fontSize || 48}px Arial`;
-	context.fillStyle = options.color ? `#${options.color.toString(16).padStart(6, '0')}` : '#ffffff';
-	context.textAlign = 'left';
-	context.textBaseline = 'top';
+    // Get the close button from the content and add click handler
+    const closeBtn = contentDiv.querySelector('#close-modal-btn');
 
-	// Word wrap the text
-	const words = text.split(' ');
-	const lines = [];
-	let currentLine = '';
-	const maxWidth = options.maxWidth || 1800;
+    // Function to close modal
+    const closeModal = () => {
+        console.log('Modal closed');
+        modal.remove();
+        if (switchToFollowMode) switchToFollowMode();
+    };
 
-	for (let i = 0; i < words.length; i++) {
-		const testLine = currentLine + (currentLine ? ' ' : '') + words[i];
-		const metrics = context.measureText(testLine);
-		if (metrics.width > maxWidth && currentLine) {
-			lines.push(currentLine);
-			currentLine = words[i];
-		} else {
-			currentLine = testLine;
-		}
-	}
-	lines.push(currentLine);
+    // Add both click and touch events for mobile compatibility
+    closeBtn.onclick = closeModal;
 
-	// Draw text lines
-	const lineHeight = (options.fontSize || 48) * (options.lineHeight || 1.4);
-	let totalHeight = 0;
+    // Add touch events for mobile
+    closeBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Prevent default touch behavior
+        console.log('Touch start on close button');
+    }, { passive: false });
 
-	lines.forEach((line, index) => {
-		const y = index * lineHeight;
-		context.fillText(line, 20, y + 20);
-		totalHeight = Math.max(totalHeight, y + lineHeight);
-	});
+    closeBtn.addEventListener('touchend', (e) => {
+        e.preventDefault(); // Prevent default touch behavior
+        console.log('Touch end on close button');
+        closeModal();
+    }, { passive: false });
 
-	// Create texture and sprite
-	const texture = new THREE.CanvasTexture(canvas);
-	texture.anisotropy = 4;
-	texture.generateMipmaps = false;
+    modalContent.appendChild(contentDiv);
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
 
-	const spriteMaterial = new THREE.SpriteMaterial({
-		map: texture,
-		transparent: true,
-		alphaTest: 0.1
-	});
+    // Close on outside click (only if clicking the modal backdrop, not the content)
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            modal.remove();
+            if (switchToFollowMode) switchToFollowMode();
+        }
+    };
 
-	const sprite = new THREE.Sprite(spriteMaterial);
-
-	// Scale sprite appropriately
-	const aspectRatio = canvas.width / canvas.height;
-	const scaleFactor = options.scale || 8;
-	sprite.scale.set(scaleFactor * aspectRatio, scaleFactor, 1);
-
-	return sprite;
+    // Close on escape
+    const escapeHandler = (e) => {
+        if (e.code === 'Escape') {
+            modal.remove();
+            if (switchToFollowMode) switchToFollowMode();
+            document.removeEventListener('keydown', escapeHandler);
+        }
+    };
+    document.addEventListener('keydown', escapeHandler);
 }
 
-function createRoundedRectGeometry(width, height, radius, segments = 6) {
-	const shape = new THREE.Shape();
-	const hw = width / 2;
-	const hh = height / 2;
-	const r = Math.min(radius, hw, hh);
-	shape.moveTo(-hw + r, -hh);
-	shape.lineTo(hw - r, -hh);
-	shape.absarc(hw - r, -hh + r, r, -Math.PI / 2, 0, false);
-	shape.lineTo(hw, hh - r);
-	shape.absarc(hw - r, hh - r, r, 0, Math.PI / 2, false);
-	shape.lineTo(-hw + r, hh);
-	shape.absarc(-hw + r, hh - r, r, Math.PI / 2, Math.PI, false);
-	shape.lineTo(-hw, -hh + r);
-	shape.absarc(-hw + r, -hh + r, r, Math.PI, 1.5 * Math.PI, false);
-	return new THREE.ShapeGeometry(shape, segments);
-}
+// Controls guide modal
+function showControlsModal() {
+    // Create modal container
+    const modal = document.createElement('div');
+    modal.id = 'controls-modal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        font-family: 'Arial', sans-serif;
+    `;
 
-// Create 3D modal for buoy content
-export function createBuoyModal(buoy, content, THREE) {
-	const modalGroup = new THREE.Group();
+    // Create modal content
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: #1a1a1a;
+        border-radius: 12px;
+        padding: 30px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        border: 2px solid #444;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        position: relative;
+        color: #fff;
+    `;
 
-	// Grey rounded background
-	const bgGeometry = createRoundedRectGeometry(30, 20, 1.6, 8);
-	const bgMaterial = new THREE.MeshBasicMaterial({
-		color: 0x222629, // dark grey
-		transparent: true,
-		opacity: 0.92,
-		side: THREE.DoubleSide
-	});
-	const background = new THREE.Mesh(bgGeometry, bgMaterial);
-	modalGroup.add(background);
+    // Detect if mobile
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
 
-	// Subtle grey border using a slightly larger rounded rect outline
-	const outlineGeometry = createRoundedRectGeometry(30.6, 20.6, 1.8, 8);
-	const outlineMaterial = new THREE.MeshBasicMaterial({
-		color: 0x3a3f44,
-		transparent: true,
-		opacity: 0.35,
-		side: THREE.DoubleSide,
-		wireframe: true
-	});
-	const outline = new THREE.Mesh(outlineGeometry, outlineMaterial);
-	outline.position.z = -0.01;
-	modalGroup.add(outline);
+    // Content with controls
+    const contentDiv = document.createElement('div');
+    contentDiv.innerHTML = `
+        <h1 style="color: #fff; margin-bottom: 25px; font-size: 1.8em; text-align: center;">🎮 Controls Guide</h1>
 
-	// Add big, readable text content using high-quality canvas sprites
-	const titleText = createTextMesh(content.title, {
-		fontSize: 64,
-		maxWidth: 1800,
-		color: 0xffffff,
-		scale: 12
-	});
-	titleText.position.set(-14, 8, 0.1);
-	modalGroup.add(titleText);
+        <div style="display: ${isMobile ? 'none' : 'block'};">
+            <h2 style="color: #888; margin-bottom: 15px; font-size: 1.2em;">🖥️ Desktop Controls</h2>
+            <div style="margin-bottom: 20px; line-height: 1.6;">
+                <div style="margin-bottom: 10px;"><strong>WASD or Arrow Keys:</strong> Sail the boat</div>
+                <div style="margin-bottom: 10px;"><strong>Shift:</strong> Speed boost while sailing</div>
+                <div style="margin-bottom: 10px;"><strong>E:</strong> View project details (near buoys)</div>
+                <div style="margin-bottom: 10px;"><strong>C:</strong> Toggle camera mode (follow/orbit)</div>
+                <div style="margin-bottom: 10px;"><strong>Mouse:</strong> Orbit camera (in orbit mode)</div>
+                <div style="margin-bottom: 10px;"><strong>Scroll:</strong> Zoom in/out (in orbit mode)</div>
+            </div>
+        </div>
 
-	const problemText = createTextMesh('PROBLEM:\n' + content.problem, {
-		fontSize: 48,
-		maxWidth: 1800,
-		lineHeight: 1.6,
-		color: 0xcfd6de,
-		scale: 10
-	});
-	problemText.position.set(-14, 4.5, 0.1);
-	modalGroup.add(problemText);
+        <div style="display: ${isMobile ? 'block' : 'none'};">
+            <h2 style="color: #888; margin-bottom: 15px; font-size: 1.2em;">📱 Mobile Controls</h2>
+            <div style="margin-bottom: 20px; line-height: 1.6;">
+                <div style="margin-bottom: 10px;"><strong>D-Pad:</strong> Sail the boat</div>
+                <div style="margin-bottom: 10px;"><strong>Speed Boost Button:</strong> Faster sailing</div>
+                <div style="margin-bottom: 10px;"><strong>E Button:</strong> View project details (near buoys)</div>
+                <div style="margin-bottom: 10px;"><strong>C Button:</strong> Toggle camera mode</div>
+                <div style="margin-bottom: 10px;"><strong>Touch & Drag:</strong> Orbit camera (in orbit mode)</div>
+                <div style="margin-bottom: 10px;"><strong>Pinch:</strong> Zoom in/out (in orbit mode)</div>
+            </div>
+        </div>
 
-	const timelineText = createTextMesh('TIMELINE:\n' + content.timeline, {
-		fontSize: 44,
-		maxWidth: 1800,
-		lineHeight: 1.6,
-		color: 0xffd857,
-		scale: 9
-	});
-	timelineText.position.set(-14, 1, 0.1);
-	modalGroup.add(timelineText);
+        <div style="margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+            <h3 style="color: #fff; margin-bottom: 10px;">💡 Tips</h3>
+            <div style="line-height: 1.6;">
+                <div>• Look for glowing buoys to find projects</div>
+                <div>• Light gray: New project • Medium gray: Ready • Dark gray: Visited</div>
+                <div>• Sail close to buoys and press E to view details</div>
+                <div>• Use C to switch between following the boat or orbiting</div>
+            </div>
+        </div>
 
-	const solutionText = createTextMesh('SOLUTION:\n' + content.solution, {
-		fontSize: 48,
-		maxWidth: 1800,
-		lineHeight: 1.6,
-		color: 0x9ff59f,
-		scale: 10
-	});
-	solutionText.position.set(-14, -3, 0.1);
-	modalGroup.add(solutionText);
+        <div style="text-align: center; margin-top: 25px;">
+            <button id="close-controls-btn" style="
+                background: #555;
+                color: #fff;
+                border: none;
+                padding: 12px 35px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                transition: background 0.2s;
+                min-width: 100px;
+                -webkit-tap-highlight-color: transparent;
+            ">Got it!</button>
+        </div>
+    `;
 
-	const tagsText = createTextMesh('TAGS:\n' + content.tags.join(', '), {
-		fontSize: 40,
-		maxWidth: 1800,
-		lineHeight: 1.6,
-		color: 0xff9a9a,
-		scale: 8
-	});
-	tagsText.position.set(-14, -6.5, 0.1);
-	modalGroup.add(tagsText);
+    // Get close button and add handler
+    const closeBtn = contentDiv.querySelector('#close-controls-btn');
+    const closeModal = () => {
+        modal.remove();
+    };
 
-	// Position modal high above buoy
-	modalGroup.position.copy(buoy.position);
-	modalGroup.position.y += 25;
-	modalGroup.lookAt(buoy.position.x, buoy.position.y + 20, buoy.position.z - 1);
+    closeBtn.onclick = closeModal;
 
-	// Store modal data
-	modalGroup.userData = {
-		buoy: buoy,
-		content: content,
-		type: 'modal'
-	};
+    // Add touch events for mobile
+    closeBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+    }, { passive: false });
 
-	return modalGroup;
-}
+    closeBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        closeModal();
+    }, { passive: false });
 
-// Show buoy information modal
-export function showBuoyModal(buoy, content, THREE, scene) {
-	// Hide existing modal if any
-	if (activeModal) {
-		scene.remove(activeModal);
-		activeModal = null;
-	}
+    // Close on outside click
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    };
 
-	// Create and show new modal
-	activeModal = createBuoyModal(buoy, content, THREE);
-	scene.add(activeModal);
-}
+    // Close on escape
+    const escapeHandler = (e) => {
+        if (e.code === 'Escape') {
+            modal.remove();
+            document.removeEventListener('keydown', escapeHandler);
+        }
+    };
+    document.addEventListener('keydown', escapeHandler);
 
-// Hide current modal
-export function hideBuoyModal(scene) {
-	if (activeModal) {
-		scene.remove(activeModal);
-		activeModal = null;
-	}
-}
-
-// Update modal position/orientation
-export function updateModal(camera, THREE) {
-	if (activeModal) {
-		// Make modal face camera
-		activeModal.lookAt(camera.position);
-		// Keep modal above its buoy at higher elevation
-		const buoy = activeModal.userData.buoy;
-		activeModal.position.x = buoy.position.x;
-		activeModal.position.z = buoy.position.z;
-		activeModal.position.y = buoy.position.y + 25;
-	}
+    modalContent.appendChild(contentDiv);
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
 }

@@ -23,13 +23,14 @@ Interactive 3D ocean experience with:
 - **Limits**: Soft fog boundary with gentle push-back
 - **Features**: Async GLB loading, proper scaling/rotation, lighting
 
-## 3. Buoy System ✅ COMPLETE
-- **Geometry**: Five cylindrical buoys at fixed world positions
+## 3. ✅ Buoy System - **COMPLETE**
+- **Geometry**: Five GLB buoys at fixed world positions
 - **Placement**: Spread across ocean in interesting cluster (NE, NW, SE, SW, far N)
-- **Interaction**: Proximity detection (40 units), E key to open 3D modal
-- **Cards**: Large 3D modal planes (20×15) with Problem/Timeline/Solution sections
+- **Interaction**: Proximity detection (40 units), E key to open modal
+- **Cards**: HTML modal with Problem/Timeline/Solution sections
 - **States**: Idle (red), highlighted (green glow), visited (golden glow)
-- **Features**: Wave floating, proximity detection, auto-close modals, content system
+- **Features**: Wave floating, proximity detection, modal system, massive 120px text with rounded backgrounds
+- **Mobile**: Touch-optimized controls and modals
 
 ## 4. Lighthouse System
 - **Geometry**: Tower + base + beam light
@@ -44,17 +45,21 @@ Interactive 3D ocean experience with:
 - **Behavior**: Fades over time, brightness scales with speed/distance
 - **Performance**: GPU-accelerated, max 200-300 particles
 
-## 6. Camera & Controls
+## 6. ✅ Camera & Controls - **COMPLETE**
 - **Default**: Soft follow on boat with slight height offset
-- **Orbit**: Maintains Three.js OrbitControls for exploration
-- **Snaps**: Cinematic transition when opening buoy cards
-- **Bounds**: Respects fog limits, prevents clipping
+- **Orbit**: Full Three.js OrbitControls for exploration
+- **Cinematic**: Smooth transitions when opening buoy cards
+- **Mobile**: Touch controls with D-pad, action buttons, haptic feedback
+- **Bounds**: Respects fog limits with bounce-back, prevents clipping
+- **Features**: Camera lag, smooth interpolation, mode switching
 
-## 7. UI & Feedback
-- **HUD**: Updated with boat controls, interaction hints
-- **Cards**: Diegetic floating planes (always face camera)
-- **Labels**: Proximity-activated floating text
-- **Accessibility**: Reduced motion toggle, keyboard-only navigation
+## 7. ✅ UI & Feedback - **MOSTLY COMPLETE**
+- **HUD**: Complete with boat controls, interaction hints, info button
+- **Cards**: HTML modals with project details (Problem/Timeline/Solution)
+- **Labels**: Massive 120px buoy text with rounded backgrounds
+- **Mobile**: Responsive design, touch controls, landscape enforcement
+- **Accessibility**: Keyboard navigation, screen reader support
+- **Controls Guide**: Auto-show on first visit, manual access via info button
 
 ## 8. Content Schema
 - **JSON Structure**: Buoys array with title/problem/timeline/solution/tags
@@ -76,10 +81,10 @@ Interactive 3D ocean experience with:
 
 ## Implementation Phases
 1. ✅ Wave sampling + boat floating - **COMPLETE**
-2. Buoys + interaction system
-3. Lighthouse + trails
-4. Camera polish + UI feedback
-5. Content integration + accessibility
+2. ✅ Buoys + interaction system - **COMPLETE**
+3. Lighthouse + trails - **PENDING**
+4. ✅ Camera polish + UI feedback - **COMPLETE**
+5. Content integration + accessibility - **MOSTLY COMPLETE**
 
 ## Dependencies
 - Three.js (already loaded)

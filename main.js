@@ -352,6 +352,7 @@ scene.add(dots);
 import { initBoat, updateBoat, boatPosition, boatRotation, boatGeometry, keys } from './boat.js';
 import { initWaveSampling } from './wave-sampling.js';
 import { initBuoys, updateBuoys, interactWithBuoy, getCurrentHighlightedBuoy, updateTextSprites } from './buoy.js';
+import { showControlsModal } from './modal.js';
 
 
 // Initialize wave sampling with our wave parameters
@@ -743,138 +744,7 @@ function animate() {
 
 	renderer.render(scene, camera);
 }
-// Controls modal function
-function showControlsModal() {
-    // Create modal container
-    const modal = document.createElement('div');
-    modal.id = 'controls-modal';
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        font-family: 'Arial', sans-serif;
-    `;
 
-    // Create modal content
-    const modalContent = document.createElement('div');
-    modalContent.style.cssText = `
-        background: #1a1a1a;
-        border-radius: 12px;
-        padding: 30px;
-        max-width: 600px;
-        width: 90%;
-        max-height: 80vh;
-        overflow-y: auto;
-        border: 2px solid #444;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        position: relative;
-        color: #fff;
-    `;
-
-    // Detect if mobile
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
-
-    // Content with controls
-    const contentDiv = document.createElement('div');
-    contentDiv.innerHTML = `
-        <h1 style="color: #fff; margin-bottom: 25px; font-size: 1.8em; text-align: center;">🎮 Controls Guide</h1>
-
-        <div style="display: ${isMobile ? 'none' : 'block'};">
-            <h2 style="color: #888; margin-bottom: 15px; font-size: 1.2em;">🖥️ Desktop Controls</h2>
-            <div style="margin-bottom: 20px; line-height: 1.6;">
-                <div style="margin-bottom: 10px;"><strong>WASD or Arrow Keys:</strong> Sail the boat</div>
-                <div style="margin-bottom: 10px;"><strong>Shift:</strong> Speed boost while sailing</div>
-                <div style="margin-bottom: 10px;"><strong>E:</strong> View project details (near buoys)</div>
-                <div style="margin-bottom: 10px;"><strong>C:</strong> Toggle camera mode (follow/orbit)</div>
-                <div style="margin-bottom: 10px;"><strong>Mouse:</strong> Orbit camera (in orbit mode)</div>
-                <div style="margin-bottom: 10px;"><strong>Scroll:</strong> Zoom in/out (in orbit mode)</div>
-            </div>
-        </div>
-
-        <div style="display: ${isMobile ? 'block' : 'none'};">
-            <h2 style="color: #888; margin-bottom: 15px; font-size: 1.2em;">📱 Mobile Controls</h2>
-            <div style="margin-bottom: 20px; line-height: 1.6;">
-                <div style="margin-bottom: 10px;"><strong>D-Pad:</strong> Sail the boat</div>
-                <div style="margin-bottom: 10px;"><strong>Speed Boost Button:</strong> Faster sailing</div>
-                <div style="margin-bottom: 10px;"><strong>E Button:</strong> View project details (near buoys)</div>
-                <div style="margin-bottom: 10px;"><strong>C Button:</strong> Toggle camera mode</div>
-                <div style="margin-bottom: 10px;"><strong>Touch & Drag:</strong> Orbit camera (in orbit mode)</div>
-                <div style="margin-bottom: 10px;"><strong>Pinch:</strong> Zoom in/out (in orbit mode)</div>
-            </div>
-        </div>
-
-        <div style="margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-            <h3 style="color: #fff; margin-bottom: 10px;">💡 Tips</h3>
-            <div style="line-height: 1.6;">
-                <div>• Look for glowing buoys to find projects</div>
-                <div>• Light gray: New project • Medium gray: Ready • Dark gray: Visited</div>
-                <div>• Sail close to buoys and press E to view details</div>
-                <div>• Use C to switch between following the boat or orbiting</div>
-            </div>
-        </div>
-
-        <div style="text-align: center; margin-top: 25px;">
-            <button id="close-controls-btn" style="
-                background: #555;
-                color: #fff;
-                border: none;
-                padding: 12px 35px;
-                border-radius: 8px;
-                cursor: pointer;
-                font-size: 16px;
-                font-weight: bold;
-                transition: background 0.2s;
-                min-width: 100px;
-                -webkit-tap-highlight-color: transparent;
-            ">Got it!</button>
-        </div>
-    `;
-
-    // Get close button and add handler
-    const closeBtn = contentDiv.querySelector('#close-controls-btn');
-    const closeModal = () => {
-        modal.remove();
-    };
-
-    closeBtn.onclick = closeModal;
-
-    // Add touch events for mobile
-    closeBtn.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-    }, { passive: false });
-
-    closeBtn.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        closeModal();
-    }, { passive: false });
-
-    // Close on outside click
-    modal.onclick = (e) => {
-        if (e.target === modal) {
-            modal.remove();
-        }
-    };
-
-    // Close on escape
-    const escapeHandler = (e) => {
-        if (e.code === 'Escape') {
-            modal.remove();
-            document.removeEventListener('keydown', escapeHandler);
-        }
-    };
-    document.addEventListener('keydown', escapeHandler);
-
-    modalContent.appendChild(contentDiv);
-    modal.appendChild(modalContent);
-    document.body.appendChild(modal);
-}
 
 // First-time visitor detection and info button setup
 document.addEventListener('DOMContentLoaded', () => {
