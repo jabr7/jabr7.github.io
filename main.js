@@ -128,10 +128,32 @@ const dots = new THREE.Points(geometry, material);
 dots.rotation.x = 0;
 scene.add(dots);
 
+// Import and initialize boat system
+import { initBoat, updateBoat, boatPosition } from './boat.js';
+import { initWaveSampling } from './wave-sampling.js';
+import { initBuoys, updateBuoys, interactWithBuoy, getCurrentHighlightedBuoy } from './buoy.js';
+
+// Initialize wave sampling with our wave parameters
+initWaveSampling(waveDirs, waveAmp, waveLen, waveSpeed, waveSteep, wavePhase);
+
+// Initialize boat
+const boat = initBoat(scene, THREE);
+
+// Initialize buoys
+const buoySystem = initBuoys(scene, THREE);
+
 function animate() {
 	requestAnimationFrame(animate);
 	material.uniforms.uTime.value += 0.02;
 	controls.update();
+
+	// Update boat
+	const time = material.uniforms.uTime.value;
+	const amplitude = material.uniforms.uAmplitude.value;
+	updateBoat(time, amplitude, THREE);
+
+	// Update buoys
+	updateBuoys(time, boatPosition, THREE);
 
 	// Bounce-back when hitting the outer limit
 	const now = performance.now();
