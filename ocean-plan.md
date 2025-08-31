@@ -39,11 +39,12 @@ Interactive 3D ocean experience with:
 - **Beam**: Rotates to highlight featured buoy
 - **Identity**: "Joaquin Bonifacino - Lead Researcher, Bachelor in Computer Systems"
 
-## 5. Bioluminescent Trails
-- **Mechanism**: Particle system trailing behind boat
-- **Colors**: Domain-coded (AI=violet, Graphics=cyan, Data=amber, Teaching=green)
-- **Behavior**: Fades over time, brightness scales with speed/distance
-- **Performance**: GPU-accelerated, max 200-300 particles
+## 5. ✅ Dynamic Water Spray System - **COMPLETE**
+- **Mechanism**: Real-time ocean particle displacement using shader uniforms
+- **Colors**: Same as ocean particles for seamless integration
+- **Behavior**: V-shaped wake follows boat with smooth 8-second fade transitions
+- **Performance**: GPU-accelerated shader displacement, no additional geometry
+- **Features**: Directional wake physics, position-based detection, ultra-smooth fade
 
 ## 6. ✅ Camera & Controls - **COMPLETE**
 - **Default**: Soft follow on boat with slight height offset
@@ -88,5 +89,6 @@ Interactive 3D ocean experience with:
 
 ## Dependencies
 - Three.js (already loaded)
+- trails.js - Water spray system (integrates with ocean particles)
 - No additional libraries needed
 - Content provided separately as JSON

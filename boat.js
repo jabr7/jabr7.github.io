@@ -183,4 +183,16 @@ export function updateBoat(time, amplitude, THREE) {
 	if (keys.right) {
 		boatRotation -= boatTurnSpeed;
 	}
+
+	// Calculate boat forward direction from its transformation matrix
+	const boatForward = new THREE.Vector3(0, 0, -1); // Local forward direction
+	boatForward.applyQuaternion(boatGeometry.quaternion); // Transform to world space
+	boatForward.y = 0; // Keep on water surface
+	boatForward.normalize();
+
+	// Return data needed for trails system
+	return {
+		velocity: boatVelocity.clone(),
+		direction: boatForward
+	};
 }

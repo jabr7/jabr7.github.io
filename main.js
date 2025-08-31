@@ -353,10 +353,14 @@ import { initBoat, updateBoat, boatPosition, boatRotation, boatGeometry, keys } 
 import { initWaveSampling } from './wave-sampling.js';
 import { initBuoys, updateBuoys, interactWithBuoy, getCurrentHighlightedBuoy, updateTextSprites } from './buoy.js';
 import { showControlsModal } from './modal.js';
+import { initTrails, updateTrails } from './trails.js';
 
 
 // Initialize wave sampling with our wave parameters
 initWaveSampling(waveDirs, waveAmp, waveLen, waveSpeed, waveSteep, wavePhase);
+
+// Initialize water spray system (integrates with ocean particles)
+initTrails(dots);
 
 // Initialize boat
 const boat = initBoat(scene, THREE);
@@ -707,7 +711,12 @@ function animate() {
 	// Update boat
 	const time = material.uniforms.uTime.value;
 	const amplitude = material.uniforms.uAmplitude.value;
-	updateBoat(time, amplitude, THREE);
+	const boatData = updateBoat(time, amplitude, THREE);
+
+	// Update bioluminescent trails
+	const boatVelocity = boatData ? boatData.velocity : new THREE.Vector3();
+	const boatDirection = boatData ? boatData.direction : new THREE.Vector3(0, 0, -1);
+	updateTrails(0.02, boatPosition, boatVelocity, boatDirection, keys);
 
 	// Update buoys
 	updateBuoys(time, boatPosition, THREE, scene);

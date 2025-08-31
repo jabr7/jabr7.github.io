@@ -45,6 +45,13 @@ export const vertexShader = `
 	varying float vEdge;       // edge fade factor
 	varying float vShimmer;    // for fragment brightness modulation
 
+	// Spray displacement uniforms for dynamic trail effect (multiple segments)
+const int MAX_TRAIL_SEGMENTS = 50;
+uniform vec3 displacementPositions[MAX_TRAIL_SEGMENTS];
+uniform float displacementHeights[MAX_TRAIL_SEGMENTS];
+uniform float displacementRadii[MAX_TRAIL_SEGMENTS];
+uniform vec3 displacementDirections[MAX_TRAIL_SEGMENTS]; // Direction for each trail segment
+
 	// 2D value noise (cheap)
 	float hash(vec2 p) {
 		return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
@@ -95,6 +102,69 @@ export const vertexShader = `
 		}
 		pos.xz += disp.xz;
 		pos.y  += disp.y;
+
+						// Dynamic spray displacement for multiple trail segments (V-shaped wake pattern)
+			// Iterate through all active trail segments and apply their effects
+		for (int i = 0; i < MAX_TRAIL_SEGMENTS; i++) {
+			if (displacementHeights[i] > 0.01) {
+				// Check if this particle is near the current trail segment
+				vec3 displacementVector = pos - displacementPositions[i];
+				float distanceToDisplacement = length(displacementVector.xz); // Only X,Z distance for water surface
+
+				// If particle is within displacement radius, apply spray effect for this segment
+				if (distanceToDisplacement < displacementRadii[i]) {
+					// Calculate angle relative to trail segment direction for V-shaped wake trail
+					vec2 toParticle = normalize(displacementVector.xz);
+					vec2 trailDir2D = normalize(displacementDirections[i].xz);
+
+					// Create V-shaped wake: only apply displacement to particles behind the boat
+					float angleToTrailDir = acos(dot(toParticle, -trailDir2D)); // Angle from trail's reverse direction
+
+					// V-shape: 90 degrees wide (45 degrees on each side of center line)
+					float maxAngle = 3.14159 * 0.25; // 45 degrees in radians
+					float trailStrength = 1.0 - smoothstep(0.0, maxAngle, abs(angleToTrailDir));
+
+					// Only apply effect to particles behind the boat (within the V-shape)
+					if (abs(angleToTrailDir) <= maxAngle) {
+						// Distance falloff - stronger effect closer to trail segment
+						float distanceFalloff = 1.0 - (distanceToDisplacement / displacementRadii[i]);
+						distanceFalloff = smoothstep(0.0, 1.0, distanceFalloff);
+
+						// Combine for final displacement strength, scaled by segment height
+						float sprayStrength = trailStrength * distanceFalloff * (displacementHeights[i] / 3.0);
+						sprayStrength = smoothstep(0.0, 1.0, sprayStrength);
+
+						// Apply displacement for wake trail effect (turbo segments are more powerful)
+						if (sprayStrength > 0.01) {
+							// Determine if this is a turbo segment based on height (turbo segments are taller)
+							bool isTurboSegment = displacementHeights[i] > 6.0; // Turbo segments start with height > 6.0
+
+							// Turbo segments have much more dramatic displacement
+							float verticalMultiplier = isTurboSegment ? 1.2 : 0.6; // Turbo: 2x more vertical lift
+							float spreadMultiplier = isTurboSegment ? 1.5 : 0.8; // Turbo: 1.875x more spread
+							float lateralMultiplier = isTurboSegment ? 0.8 : 0.4; // Turbo: 2x more lateral movement
+							float variationMultiplier = isTurboSegment ? 0.4 : 0.2; // Turbo: 2x more variation
+
+							// Vertical displacement (foam rising) - scaled by segment strength
+							pos.y += displacementHeights[i] * sprayStrength * verticalMultiplier;
+
+							// Horizontal displacement along wake direction
+							vec2 wakeDir = -trailDir2D; // Opposite of trail direction
+							float wakeSpread = sprayStrength * distanceToDisplacement * spreadMultiplier;
+							pos.xz += wakeDir * wakeSpread;
+
+							// Add lateral movement for realistic wake
+							vec2 lateralDir = vec2(-trailDir2D.y, trailDir2D.x); // Perpendicular to wake direction
+							float lateralAmount = sin(distanceToDisplacement * 4.0 + float(i)) * sprayStrength * lateralMultiplier;
+							pos.xz += lateralDir * lateralAmount;
+
+							// Wave-like vertical variation
+							pos.y += sin(distanceToDisplacement * 3.0 + displacementPositions[i].x * 0.1 + float(i) * 0.5) * sprayStrength * variationMultiplier;
+						}
+					}
+				}
+			}
+		}
 
 		float hBase = disp.y;
 		// Base grayscale from base height only (preserve texture look)
