@@ -117,10 +117,6 @@ function updateFollowCamera(boatPosition, deltaTime) {
     // Use lookAt to rotate camera towards the target point
     camera.lookAt(lookTarget);
 
-    // Debug: Log camera and boat positions occasionally
-    if (Math.random() < 0.005) { // Log ~0.5% of frames
-        console.log('Camera:', camera.position, 'Target:', controls.target, 'Boat:', boatPosition, 'Direction:', boatDirection);
-    }
 }
 
 function startCinematicTransition(targetBuoy) {
@@ -353,7 +349,7 @@ dots.rotation.x = 0;
 scene.add(dots);
 
 // Import and initialize boat system
-import { initBoat, updateBoat, boatPosition, boatRotation, boatGeometry } from './boat.js';
+import { initBoat, updateBoat, boatPosition, boatRotation, boatGeometry, keys } from './boat.js';
 import { initWaveSampling } from './wave-sampling.js';
 import { initBuoys, updateBuoys, interactWithBuoy, getCurrentHighlightedBuoy, updateTextSprites } from './buoy.js';
 
@@ -367,13 +363,306 @@ const boat = initBoat(scene, THREE);
 // Initialize camera in follow mode (after boat is ready)
 switchCameraMode(CAMERA_MODES.FOLLOW);
 
+// Mobile control functions - Clean D-pad style
+function createMobileControls() {
+    // Create control container
+    const controlsContainer = document.createElement('div');
+    controlsContainer.id = 'mobile-controls';
+    controlsContainer.style.cssText = `
+        position: fixed;
+        bottom: 30px;
+        left: 30px;
+        z-index: 100;
+        pointer-events: none;
+    `;
+
+    // D-pad container (4 directional buttons in a cross pattern)
+    const dpadContainer = document.createElement('div');
+    dpadContainer.style.cssText = `
+        position: relative;
+        width: 180px;
+        height: 180px;
+        pointer-events: auto;
+    `;
+
+    // Center point for positioning
+    const centerX = 90;
+    const centerY = 90;
+    const buttonSize = 50;
+    const spacing = 55;
+
+    // Create directional buttons
+    const directions = [
+        { key: 'forward', symbol: '↑', x: centerX - buttonSize/2, y: centerY - spacing - buttonSize/2 },
+        { key: 'backward', symbol: '↓', x: centerX - buttonSize/2, y: centerY + spacing - buttonSize/2 },
+        { key: 'left', symbol: '←', x: centerX - spacing - buttonSize/2, y: centerY - buttonSize/2 },
+        { key: 'right', symbol: '→', x: centerX + spacing - buttonSize/2, y: centerY - buttonSize/2 }
+    ];
+
+    directions.forEach(dir => {
+        const button = document.createElement('button');
+        button.textContent = dir.symbol;
+        button.style.cssText = `
+            position: absolute;
+            left: ${dir.x}px;
+            top: ${dir.y}px;
+            width: ${buttonSize}px;
+            height: ${buttonSize}px;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        `;
+
+        // Add event listeners
+        button.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            keys[dir.key] = true;
+            button.style.transform = 'scale(0.9)';
+            button.style.background = 'rgba(255, 255, 255, 0.3)';
+            if (navigator.vibrate) navigator.vibrate(40);
+        });
+
+        button.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            keys[dir.key] = false;
+            button.style.transform = 'scale(1)';
+            button.style.background = 'rgba(0, 0, 0, 0.7)';
+        });
+
+        button.addEventListener('touchcancel', (e) => {
+            keys[dir.key] = false;
+            button.style.transform = 'scale(1)';
+            button.style.background = 'rgba(0, 0, 0, 0.7)';
+        });
+
+        dpadContainer.appendChild(button);
+    });
+
+    // Action buttons (right side)
+    const actionContainer = document.createElement('div');
+    actionContainer.style.cssText = `
+        position: absolute;
+        left: 220px;
+        top: 50px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        pointer-events: auto;
+    `;
+
+    // Interact button
+    const interactBtn = createControlButton('🎯', 'interact-btn', () => {
+        const event = new KeyboardEvent('keydown', { code: 'KeyE' });
+        document.dispatchEvent(event);
+        if (navigator.vibrate) navigator.vibrate(80);
+    }, null, 60);
+
+    // Camera toggle button
+    const cameraBtn = createControlButton('📹', 'camera-btn', () => {
+        const event = new KeyboardEvent('keydown', { code: 'KeyC' });
+        document.dispatchEvent(event);
+        if (navigator.vibrate) navigator.vibrate(60);
+    }, null, 60);
+
+    actionContainer.appendChild(interactBtn);
+    actionContainer.appendChild(cameraBtn);
+
+    controlsContainer.appendChild(dpadContainer);
+    controlsContainer.appendChild(actionContainer);
+    document.body.appendChild(controlsContainer);
+}
+
+function createControlButton(text, className, onPress, onRelease = null, size = 50) {
+    const button = document.createElement('button');
+    button.textContent = text;
+    button.className = className;
+    button.style.cssText = `
+        width: ${size}px;
+        height: ${size}px;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        font-size: ${size * 0.4}px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    `;
+
+    button.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        button.style.transform = 'scale(0.9)';
+        button.style.background = 'rgba(255, 255, 255, 0.3)';
+        if (onPress) onPress();
+    });
+
+    button.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        button.style.transform = 'scale(1)';
+        button.style.background = 'rgba(0, 0, 0, 0.7)';
+        if (onRelease) onRelease();
+    });
+
+    button.addEventListener('touchcancel', (e) => {
+        button.style.transform = 'scale(1)';
+        button.style.background = 'rgba(0, 0, 0, 0.7)';
+        if (onRelease) onRelease();
+    });
+
+    return button;
+}
+
+function updateMobileHUD() {
+    const hud = document.getElementById('hud');
+    if (hud) {
+        // Preserve original positioning for info button
+        hud.style.position = 'relative';
+        hud.style.fontSize = '11px';
+        hud.style.bottom = '220px';
+        hud.style.top = 'auto';
+        hud.style.left = '10px';
+        hud.style.right = '10px';
+        hud.style.textAlign = 'center';
+
+        // Ensure info button stays visible and properly positioned
+        const infoBtn = document.getElementById('info-btn');
+        if (infoBtn) {
+            infoBtn.style.position = 'fixed';
+            infoBtn.style.top = '10px';
+            infoBtn.style.left = '10px';
+            infoBtn.style.zIndex = '1000';
+        }
+    }
+}
+
+// Force landscape orientation on mobile
+function enforceLandscape() {
+    if (isMobile && screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('landscape').catch(err => {
+            console.log('Could not lock to landscape:', err);
+        });
+    }
+
+    // Create orientation warning for portrait
+    if (window.innerHeight > window.innerWidth && isMobile) {
+        const warning = document.createElement('div');
+        warning.id = 'orientation-warning';
+        warning.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        `;
+        warning.innerHTML = `
+            <div style="font-size: 48px; margin-bottom: 20px;">📱</div>
+            <h2>Please rotate your device</h2>
+            <p>This experience works best in landscape mode</p>
+            <div style="font-size: 24px; margin-top: 20px;">↻</div>
+        `;
+
+        document.body.appendChild(warning);
+
+        // Hide warning when rotated to landscape
+        const checkOrientation = () => {
+            if (window.innerWidth > window.innerHeight) {
+                const warning = document.getElementById('orientation-warning');
+                if (warning) {
+                    warning.remove();
+                }
+            }
+        };
+
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('orientationchange', checkOrientation);
+    }
+}
+
+// Mobile detection and touch controls
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+
+if (isMobile) {
+    createMobileControls();
+    updateMobileHUD();
+    enforceLandscape();
+}
+
 // Initialize buoys
 const buoySystem = initBuoys(scene, THREE);
+
+// Mobile touch event handling
+if (isMobile) {
+    // Prevent default touch behaviors that interfere with 3D scene
+    document.addEventListener('touchstart', (e) => {
+        // Only prevent if not touching mobile controls
+        if (!e.target.closest('#mobile-controls')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    document.addEventListener('touchmove', (e) => {
+        // Allow touchmove on mobile controls but prevent others
+        if (!e.target.closest('#mobile-controls')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    // Prevent double-tap zoom
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+            e.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+
+    // Prevent context menu on mobile
+    document.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+    });
+}
 
 // Handle E key for buoy interaction and Escape to close modals
 document.addEventListener('keydown', (event) => {
 	if (event.code === 'KeyE') {
 		event.preventDefault();
+		console.log('E key pressed - checking for modal or interaction');
+
+		// Check if SweetAlert2 modal is currently open
+		if (document.querySelector('.swal2-container')) {
+			console.log('Modal is open, ignoring E key');
+			return; // Don't process E key if modal is open
+		}
+
+		console.log('No modal open, processing E key for interaction');
 		interactWithBuoy(THREE, scene, startCinematicTransition, () => switchCameraMode(CAMERA_MODES.FOLLOW));
 	}
 	if (event.code === 'KeyC') {
@@ -454,6 +743,169 @@ function animate() {
 
 	renderer.render(scene, camera);
 }
+// Controls modal function
+function showControlsModal() {
+    // Create modal container
+    const modal = document.createElement('div');
+    modal.id = 'controls-modal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        font-family: 'Arial', sans-serif;
+    `;
+
+    // Create modal content
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: #1a1a1a;
+        border-radius: 12px;
+        padding: 30px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        border: 2px solid #444;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        position: relative;
+        color: #fff;
+    `;
+
+    // Detect if mobile
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+
+    // Content with controls
+    const contentDiv = document.createElement('div');
+    contentDiv.innerHTML = `
+        <h1 style="color: #fff; margin-bottom: 25px; font-size: 1.8em; text-align: center;">🎮 Controls Guide</h1>
+
+        <div style="display: ${isMobile ? 'none' : 'block'};">
+            <h2 style="color: #888; margin-bottom: 15px; font-size: 1.2em;">🖥️ Desktop Controls</h2>
+            <div style="margin-bottom: 20px; line-height: 1.6;">
+                <div style="margin-bottom: 10px;"><strong>WASD or Arrow Keys:</strong> Sail the boat</div>
+                <div style="margin-bottom: 10px;"><strong>Shift:</strong> Speed boost while sailing</div>
+                <div style="margin-bottom: 10px;"><strong>E:</strong> View project details (near buoys)</div>
+                <div style="margin-bottom: 10px;"><strong>C:</strong> Toggle camera mode (follow/orbit)</div>
+                <div style="margin-bottom: 10px;"><strong>Mouse:</strong> Orbit camera (in orbit mode)</div>
+                <div style="margin-bottom: 10px;"><strong>Scroll:</strong> Zoom in/out (in orbit mode)</div>
+            </div>
+        </div>
+
+        <div style="display: ${isMobile ? 'block' : 'none'};">
+            <h2 style="color: #888; margin-bottom: 15px; font-size: 1.2em;">📱 Mobile Controls</h2>
+            <div style="margin-bottom: 20px; line-height: 1.6;">
+                <div style="margin-bottom: 10px;"><strong>D-Pad:</strong> Sail the boat</div>
+                <div style="margin-bottom: 10px;"><strong>Speed Boost Button:</strong> Faster sailing</div>
+                <div style="margin-bottom: 10px;"><strong>E Button:</strong> View project details (near buoys)</div>
+                <div style="margin-bottom: 10px;"><strong>C Button:</strong> Toggle camera mode</div>
+                <div style="margin-bottom: 10px;"><strong>Touch & Drag:</strong> Orbit camera (in orbit mode)</div>
+                <div style="margin-bottom: 10px;"><strong>Pinch:</strong> Zoom in/out (in orbit mode)</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+            <h3 style="color: #fff; margin-bottom: 10px;">💡 Tips</h3>
+            <div style="line-height: 1.6;">
+                <div>• Look for glowing buoys to find projects</div>
+                <div>• Light gray: New project • Medium gray: Ready • Dark gray: Visited</div>
+                <div>• Sail close to buoys and press E to view details</div>
+                <div>• Use C to switch between following the boat or orbiting</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 25px;">
+            <button id="close-controls-btn" style="
+                background: #555;
+                color: #fff;
+                border: none;
+                padding: 12px 35px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                transition: background 0.2s;
+                min-width: 100px;
+                -webkit-tap-highlight-color: transparent;
+            ">Got it!</button>
+        </div>
+    `;
+
+    // Get close button and add handler
+    const closeBtn = contentDiv.querySelector('#close-controls-btn');
+    const closeModal = () => {
+        modal.remove();
+    };
+
+    closeBtn.onclick = closeModal;
+
+    // Add touch events for mobile
+    closeBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+    }, { passive: false });
+
+    closeBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        closeModal();
+    }, { passive: false });
+
+    // Close on outside click
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    };
+
+    // Close on escape
+    const escapeHandler = (e) => {
+        if (e.code === 'Escape') {
+            modal.remove();
+            document.removeEventListener('keydown', escapeHandler);
+        }
+    };
+    document.addEventListener('keydown', escapeHandler);
+
+    modalContent.appendChild(contentDiv);
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+}
+
+// First-time visitor detection and info button setup
+document.addEventListener('DOMContentLoaded', () => {
+    const hasVisited = localStorage.getItem('oceanPortfolioVisited');
+
+    // Show controls modal on first visit
+    if (!hasVisited) {
+        // Small delay to let the page load
+        setTimeout(() => {
+            showControlsModal();
+            localStorage.setItem('oceanPortfolioVisited', 'true');
+        }, 1000);
+    }
+
+    // Setup info button
+    const infoBtn = document.getElementById('info-btn');
+    if (infoBtn) {
+        infoBtn.onclick = showControlsModal;
+
+        // Add touch events for mobile
+        infoBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+
+        infoBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            showControlsModal();
+        }, { passive: false });
+    }
+});
+
 animate();
 
 window.addEventListener('resize', () => {
