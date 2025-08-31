@@ -216,34 +216,82 @@ export function initBuoys(scene, THREE) {
             // Add project title text above the icon
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
-            canvas.width = 256;
-            canvas.height = 64;
+            canvas.width = 1836;  // Even larger canvas for bigger text
+            canvas.height = 384;  // Even larger height for bigger text
 
-            context.font = 'Bold 20px Arial';
-            context.fillStyle = '#cccccc';
+            // Clear canvas with transparent background
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Set up text properties
+            const fontSize = 120;  // Increased from 80px to 120px
+            context.font = `Bold ${fontSize}px Arial`;
             context.textAlign = 'center';
-            context.fillText(buoyContent[index].title, 128, 35);
+            context.textBaseline = 'middle';
+
+            // Measure text to create background
+            const textWidth = context.measureText(buoyContent[index].title).width;
+            const textHeight = fontSize * 1.2; // Approximate line height
+            const padding = 60;  // Increased padding
+            const bgWidth = textWidth + (padding * 2);
+            const bgHeight = textHeight + (padding * 2);
+            const bgX = (canvas.width - bgWidth) / 2;
+            const bgY = (canvas.height - bgHeight) / 2;
+            const cornerRadius = 35;  // Larger corner radius
+
+            // Draw rounded background rectangle
+            context.fillStyle = 'rgba(0, 0, 0, 0.8)'; // Semi-transparent black background
+            context.strokeStyle = '#ffffff'; // White border
+            context.lineWidth = 4;
+
+            // Draw rounded rectangle background (with fallback for older browsers)
+            context.beginPath();
+            if (context.roundRect) {
+                // Modern browsers with roundRect support
+                context.roundRect(bgX, bgY, bgWidth, bgHeight, cornerRadius);
+            } else {
+                // Fallback for older browsers - draw rounded rectangle manually
+                context.moveTo(bgX + cornerRadius, bgY);
+                context.arcTo(bgX + bgWidth, bgY, bgX + bgWidth, bgY + cornerRadius, cornerRadius);
+                context.arcTo(bgX + bgWidth, bgY + bgHeight, bgX + bgWidth - cornerRadius, bgY + bgHeight, cornerRadius);
+                context.arcTo(bgX, bgY + bgHeight, bgX, bgY + bgHeight - cornerRadius, cornerRadius);
+                context.arcTo(bgX, bgY, bgX + cornerRadius, bgY, cornerRadius);
+                context.closePath();
+            }
+            context.fill();
+            context.stroke();
+
+            // Draw the text
+            context.fillStyle = '#ffffff'; // White text
+            context.strokeStyle = '#000000'; // Black text outline
+            context.lineWidth = 8;  // Thicker outline for larger text
+            context.strokeText(buoyContent[index].title, canvas.width / 2, canvas.height / 2);
+            context.fillText(buoyContent[index].title, canvas.width / 2, canvas.height / 2);
 
             const textTexture = new THREE.CanvasTexture(canvas);
+            textTexture.generateMipmaps = false; // Prevent texture blurring
+            textTexture.minFilter = THREE.LinearFilter;
+            textTexture.magFilter = THREE.LinearFilter;
+
             const textMaterial = new THREE.SpriteMaterial({
                 map: textTexture,
                 transparent: true,
-                opacity: 0.7
+                opacity: 1.0  // Fully opaque for better visibility
             });
             const textSprite = new THREE.Sprite(textMaterial);
-            textSprite.scale.set(4, 1, 1);
-            textSprite.position.set(0, 9.5, 0); // Position above icon
+            textSprite.scale.set(18, 4.5, 1);  // Even larger scale for 120px text
+            textSprite.position.set(0, 15, 0); // Position even higher above icon
 
             buoyGroup.add(textSprite);
 
             // Add bobbing animation
-            const bobAnimation = new TWEEN.Tween({ y: 8 })
-                .to({ y: 8.5 }, 2000 + Math.random() * 1000)
+            const bobAnimation = new TWEEN.Tween({ y: 8, textY: 15 })
+                .to({ y: 8.5, textY: 15.5 }, 2000 + Math.random() * 1000)
                 .easing(TWEEN.Easing.Sinusoidal.InOut)
                 .yoyo(true)
                 .repeat(Infinity)
                 .onUpdate(function(obj) {
                     icon.position.y = obj.y;
+                    textSprite.position.y = obj.textY; // Make text bob with icon
                 })
                 .start();
 
