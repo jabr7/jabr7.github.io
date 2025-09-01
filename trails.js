@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 
 // Spray system configuration
-const TRAIL_DISTANCE = 8; // How far behind boat to create spray
+const TRAIL_DISTANCE = 6; // How far behind boat to create spray
 const SPRAY_HEIGHT = 5.0; // Particle displacement height
 const SPRAY_RADIUS = 15; // V-shaped wake pattern radius
 const FADE_DURATION = 20.0; // Trail persistence duration (seconds)

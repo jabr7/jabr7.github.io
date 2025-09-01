@@ -50,7 +50,7 @@ const CAMERA_MODES = {
 let currentCameraMode = CAMERA_MODES.FOLLOW;
 
 // Follow camera settings
-const FOLLOW_DISTANCE = 20;
+const FOLLOW_DISTANCE = 30;
 const FOLLOW_HEIGHT = 12;
 const FOLLOW_LAG = 0.15; // Very responsive following for turns
 const CAMERA_LAG_POSITION = 0.12; // Separate lag for position

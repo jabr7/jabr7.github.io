@@ -51,6 +51,8 @@
 			user-select: text;
 		}
 
+
+
 		/* Mobile SweetAlert2 fixes */
 		@media (max-width: 768px) {
 			.swal2-popup {
@@ -114,6 +116,30 @@
 			" onmouseover="this.style.background='rgba(0,0,0,0.9)'; this.style.borderColor='#666';"
 			onmouseout="this.style.background='rgba(0,0,0,0.7)'; this.style.borderColor='#444';">ℹ️ Controls</span>
 		</div>
+
+		<!-- Simple LoFi Music Toggle -->
+		<button id="music-toggle" style="
+			position: absolute;
+			top: 20px;
+			left: 150px;
+			background: rgba(0,0,0,0.7);
+			color: #fff;
+			border: 1px solid #666;
+			border-radius: 4px;
+			padding: 5px 10px;
+			cursor: pointer;
+			font-size: 12px;
+			transition: all 0.2s;
+			z-index: 100;
+		" onmouseover="this.style.background='rgba(0,0,0,0.9)'; this.style.borderColor='#999';"
+		onmouseout="this.style.background='rgba(0,0,0,0.7)'; this.style.borderColor='#666';">🎵 LoFi</button>
+
+		<!-- LoFi Background Music -->
+		<audio id="lofi-music" loop preload="none">
+			<source src="./audio/lofi-chill.mp3" type="audio/mpeg">
+			<source src="./audio/lofi-chill.wav" type="audio/wav">
+			Your browser does not support the audio element.
+		</audio>
 	<script type="importmap">
 	{
 		"imports": {
@@ -121,6 +147,47 @@
 			"three/addons/": "https://unpkg.com/three@0.167.1/examples/jsm/"
 		}
 	}
+	</script>
+
+	<!-- Simple LoFi Music Script -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const musicToggle = document.getElementById('music-toggle');
+			const lofiMusic = document.getElementById('lofi-music');
+			let isPlaying = false;
+
+			// Set volume to low for background music
+			lofiMusic.volume = 0.2;
+
+			// Toggle music on button click
+			musicToggle.addEventListener('click', function() {
+				if (isPlaying) {
+					lofiMusic.pause();
+					musicToggle.textContent = '🎵 LoFi';
+					musicToggle.style.background = 'rgba(0,0,0,0.7)';
+					console.log('🎵 LoFi music paused');
+				} else {
+					lofiMusic.play().then(() => {
+						musicToggle.textContent = '🎵 Playing';
+						musicToggle.style.background = 'rgba(74, 144, 226, 0.7)';
+						console.log('🎵 LoFi music started');
+					}).catch(error => {
+						console.error('Error playing LoFi music:', error);
+						alert('Unable to play music. Please check your browser settings or add audio files.');
+					});
+				}
+				isPlaying = !isPlaying;
+			});
+
+			// Update button state when music ends
+			lofiMusic.addEventListener('ended', function() {
+				isPlaying = false;
+				musicToggle.textContent = '🎵 LoFi';
+				musicToggle.style.background = 'rgba(0,0,0,0.7)';
+			});
+
+			console.log('🎵 Simple LoFi music ready! Click the button to start.');
+		});
 	</script>
 
 	<script type="module" src="./main.js"></script>
