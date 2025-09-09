@@ -159,11 +159,11 @@ const buoyContent = [
     },
     {
         id: 4,
-        title: "Call Center Chat Assist",
-        problem: "Agents needed faster, more consistent replies for common intents.",
-        timeline: "4-6 weeks • AI engineer",
-        solution: "Built intent → template → grounded completion flow. Guardrails for PII and policy boundaries. Live-tuned prompts on feedback logs.",
-        tags: ["Chat", "guardrails", "prompt engineering"]
+        title: "Multi-Agent Financial Companion",
+        problem: "Talking about money is scary for people of all ages and genders. Traditional financial tools feel cold, judgmental, and disconnected from our real emotional relationship with money.",
+        timeline: "8-12 weeks • Lead architect",
+        solution: "Built a financial companion that gets into YOUR personality and stands on YOUR side. Three specialized agents work together: Finance Agent connects to your real data via Plaid, Wealth Agent provides personalized coaching, and Goal Agent helps you build budgets that actually work for your life. The system remembers your money feelings, adapts to your anxiety levels, and creates a safe space for financial growth.",
+        tags: ["Financial Coaching", "Personal AI", "Emotional Intelligence", "Budget Goals", "User-Centered"]
     },
     {
         id: 5,
