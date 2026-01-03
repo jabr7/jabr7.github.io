@@ -361,6 +361,76 @@ cameraModeIndicator.style.cssText = `
 cameraModeIndicator.textContent = 'CAMERA: FOLLOW';
 document.body.appendChild(cameraModeIndicator);
 
+// Fullscreen toggle (Android Chrome support; requires user gesture)
+const fullscreenBtn = document.createElement('button');
+fullscreenBtn.className = 'hud-button';
+fullscreenBtn.id = 'fullscreen-btn';
+fullscreenBtn.type = 'button';
+fullscreenBtn.textContent = 'Fullscreen';
+fullscreenBtn.style.cssText = `
+    position: fixed;
+    top: calc(10px + env(safe-area-inset-top, 0px));
+    right: calc(200px + env(safe-area-inset-right, 0px));
+    z-index: 1001;
+`;
+
+function isFullscreenActive() {
+    return Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+}
+
+async function requestFullscreen() {
+    const el = document.documentElement;
+    if (el.requestFullscreen) {
+        await el.requestFullscreen({ navigationUI: 'hide' });
+        return;
+    }
+    if (el.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen();
+        return;
+    }
+    throw new Error('Fullscreen not supported');
+}
+
+async function exitFullscreen() {
+    if (document.exitFullscreen) {
+        await document.exitFullscreen();
+        return;
+    }
+    if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+        return;
+    }
+    throw new Error('Fullscreen exit not supported');
+}
+
+function updateFullscreenBtnLabel() {
+    fullscreenBtn.textContent = isFullscreenActive() ? 'Exit Fullscreen' : 'Fullscreen';
+}
+
+function fullscreenSupported() {
+    const el = document.documentElement;
+    return Boolean(document.fullscreenEnabled || document.webkitFullscreenEnabled || el.requestFullscreen || el.webkitRequestFullscreen);
+}
+
+if (fullscreenSupported()) {
+    document.body.appendChild(fullscreenBtn);
+    updateFullscreenBtnLabel();
+    document.addEventListener('fullscreenchange', updateFullscreenBtnLabel);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenBtnLabel);
+
+    fullscreenBtn.addEventListener('click', async () => {
+        try {
+            if (isFullscreenActive()) {
+                await exitFullscreen();
+            } else {
+                await requestFullscreen();
+            }
+        } finally {
+            updateFullscreenBtnLabel();
+        }
+    });
+}
+
 // Update camera mode indicator
 function updateCameraModeIndicator() {
     let modeText = 'CAMERA: ';

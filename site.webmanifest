@@ -1,0 +1,19 @@
+{
+  "name": "Joaquin Bonifacino Portfolio",
+  "short_name": "Portfolio",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#050506",
+  "theme_color": "#050506",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
+
