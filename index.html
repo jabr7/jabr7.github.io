@@ -512,27 +512,42 @@
 	<!-- Loader and Hint Text Logic -->
 	<script>
 		// Loader fade-out logic
+		const MIN_LOADER_TIME = 1000; // Minimum 1 second display time
+		const loaderStartTime = performance.now();
 		let loaderHidden = false;
+		let sceneReadyFired = false;
+
 		function hideLoader() {
 			if (loaderHidden) return;
-			const loader = document.getElementById('loader');
-			if (loader) {
-				loaderHidden = true;
-				loader.classList.add('hidden');
-				setTimeout(() => {
-					loader.remove();
-				}, 800);
-			}
+			
+			const elapsed = performance.now() - loaderStartTime;
+			const remainingTime = Math.max(0, MIN_LOADER_TIME - elapsed);
+			
+			setTimeout(() => {
+				if (loaderHidden) return;
+				const loader = document.getElementById('loader');
+				if (loader) {
+					loaderHidden = true;
+					loader.classList.add('hidden');
+					setTimeout(() => {
+						loader.remove();
+						window.dispatchEvent(new CustomEvent('loaderHidden'));
+					}, 800);
+				}
+			}, remainingTime);
 		}
 
 		// Listen for scene ready event from main.js
 		window.addEventListener('sceneReady', () => {
+			sceneReadyFired = true;
 			hideLoader();
 		});
 
 		// Fallback: hide loader after maximum expected load time
 		setTimeout(() => {
-			hideLoader();
+			if (!sceneReadyFired) {
+				hideLoader();
+			}
 		}, 5000);
 
 		// Hint text logic

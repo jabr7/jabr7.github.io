@@ -67,6 +67,132 @@ let cinematicEndPosition = new THREE.Vector3();
 let cinematicEndTarget = new THREE.Vector3();
 let isInCinematic = false;
 
+// Intro fly-in (runs once on load)
+const INTRO_FLYIN_DURATION = 2600;
+let introStarted = false;
+let isInIntro = false;
+let introPrepared = false;
+let introTweenStarted = false;
+const introStartPosition = new THREE.Vector3();
+const introStartTarget = new THREE.Vector3();
+const introEndPosition = new THREE.Vector3();
+const introEndTarget = new THREE.Vector3();
+
+function computeFollowPose() {
+	const posePosition = new THREE.Vector3();
+	const poseTarget = new THREE.Vector3();
+
+	if (!boatPosition) {
+		return { position: posePosition, target: poseTarget };
+	}
+
+	const boatDirection = new THREE.Vector3(0, 0, -1);
+	if (boatGeometry) {
+		boatDirection.applyQuaternion(boatGeometry.quaternion);
+		boatDirection.y = 0;
+		boatDirection.normalize();
+	} else {
+		boatDirection.set(Math.sin(boatRotation), 0, Math.cos(boatRotation));
+	}
+
+	const rightVector = new THREE.Vector3();
+	rightVector.crossVectors(boatDirection, new THREE.Vector3(0, 1, 0)).normalize();
+
+	posePosition.copy(boatPosition);
+	posePosition.addScaledVector(boatDirection, -FOLLOW_DISTANCE);
+	posePosition.addScaledVector(rightVector, 2);
+	posePosition.y += FOLLOW_HEIGHT;
+
+	poseTarget.copy(boatPosition);
+	poseTarget.addScaledVector(boatDirection, 8);
+	poseTarget.y += 3;
+
+	return { position: posePosition, target: poseTarget };
+}
+
+function prepareIntroFlyIn() {
+	if (introPrepared) return;
+	if (!boatPosition || !boatGeometry) return;
+
+	introPrepared = true;
+
+	const endPose = computeFollowPose();
+	introEndPosition.copy(endPose.position);
+	introEndTarget.copy(endPose.target);
+
+	const endOffset = introEndPosition.clone().sub(introEndTarget);
+	const endRadius = endOffset.length();
+	const baseDir = endRadius > 0.0001 ? endOffset.clone().normalize() : new THREE.Vector3(0.6, 0.35, 0.7).normalize();
+	const flyDir = baseDir.clone();
+	flyDir.y = 0;
+	flyDir.normalize();
+	const startRadius = endRadius + 420;
+
+	introStartPosition.copy(introEndTarget).add(flyDir.multiplyScalar(startRadius));
+	introStartPosition.y = boatGeometry.position.y + 35;
+	introStartTarget.copy(boatGeometry.position);
+	introStartTarget.y = boatGeometry.position.y + 8;
+
+	// Freeze camera at the fly-in start pose (behind the loader) so there is no "follow camera" flash.
+	introStarted = true;
+	isInIntro = true;
+	controls.enabled = false;
+	currentCameraMode = CAMERA_MODES.CINEMATIC;
+	isInCinematic = false;
+
+	camera.position.copy(introStartPosition);
+	controls.target.copy(introStartTarget);
+	camera.lookAt(controls.target);
+}
+
+function startIntroFlyIn() {
+	if (introTweenStarted) return;
+	prepareIntroFlyIn();
+	if (!introPrepared) return;
+
+	// If a SweetAlert2 modal is open (welcome / content), wait until it's gone
+	if (document.querySelector('.swal2-container')) {
+		setTimeout(startIntroFlyIn, 250);
+		return;
+	}
+
+	introTweenStarted = true;
+
+	const splitT = 0.9;
+	const splitMs = Math.round(INTRO_FLYIN_DURATION * 0.8);
+	const settleMs = Math.max(220, INTRO_FLYIN_DURATION - splitMs);
+
+	const midPosition = introStartPosition.clone().lerp(introEndPosition, splitT);
+	const midTarget = introStartTarget.clone().lerp(introEndTarget, splitT);
+
+	const stage1 = { t: 0 };
+	new TWEEN.Tween(stage1)
+		.to({ t: 1 }, splitMs)
+		.easing(TWEEN.Easing.Quartic.In)
+		.onUpdate(() => {
+			camera.position.lerpVectors(introStartPosition, midPosition, stage1.t);
+			controls.target.lerpVectors(introStartTarget, midTarget, stage1.t);
+			camera.lookAt(controls.target);
+		})
+		.onComplete(() => {
+			const stage2 = { t: 0 };
+			new TWEEN.Tween(stage2)
+				.to({ t: 1 }, settleMs)
+				.easing(TWEEN.Easing.Cubic.Out)
+				.onUpdate(() => {
+					camera.position.lerpVectors(midPosition, introEndPosition, stage2.t);
+					controls.target.lerpVectors(midTarget, introEndTarget, stage2.t);
+					camera.lookAt(controls.target);
+				})
+				.onComplete(() => {
+					isInIntro = false;
+					switchCameraMode(CAMERA_MODES.FOLLOW);
+				})
+				.start();
+		})
+		.start();
+}
+
 // Temp objects for angle logging
 const _tmpOffset = new THREE.Vector3();
 const _tmpSph = new THREE.Spherical();
@@ -121,6 +247,7 @@ function updateFollowCamera(boatPosition, deltaTime) {
 
 function startCinematicTransition(targetBuoy) {
     if (isInCinematic) return;
+	if (isInIntro) return;
 
     isInCinematic = true;
     currentCameraMode = CAMERA_MODES.CINEMATIC;
@@ -692,7 +819,9 @@ function animate() {
 	TWEEN.update();
 
 	// Update camera based on current mode
-	if (currentCameraMode === CAMERA_MODES.FOLLOW && !isInCinematic) {
+	if (isInIntro) {
+		// Intro tween drives the camera
+	} else if (currentCameraMode === CAMERA_MODES.FOLLOW && !isInCinematic) {
 		updateFollowCamera(boatPosition, 0.02);
 	} else if (currentCameraMode === CAMERA_MODES.CINEMATIC || isInCinematic) {
 		updateCinematicCamera();
@@ -727,6 +856,11 @@ function animate() {
 	// HTML modal handles its own closing logic
 
 	// Bounce-back when hitting the outer limit
+	if (isInIntro || isInCinematic) {
+		renderer.render(scene, camera);
+		return;
+	}
+
 	const now = performance.now();
 
 	const currentRadius = camera.position.distanceTo(controls.target);
@@ -793,6 +927,7 @@ function checkSceneReady() {
 	if (!sceneReadyDispatched && boat && buoys.length > 0) {
 		sceneReadyDispatched = true;
 		window.dispatchEvent(new CustomEvent('sceneReady'));
+		prepareIntroFlyIn();
 	}
 }
 
@@ -803,6 +938,11 @@ const readyCheckInterval = setInterval(() => {
 		clearInterval(readyCheckInterval);
 	}
 }, 100);
+
+// Start intro once loader is actually gone (prevents "follow camera" flash)
+window.addEventListener('loaderHidden', () => {
+	startIntroFlyIn();
+});
 
 window.addEventListener('resize', () => {
 	camera.aspect = window.innerWidth / window.innerHeight;
