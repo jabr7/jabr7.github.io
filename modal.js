@@ -137,50 +137,38 @@ function showProjectModal(content, switchToFollowMode) {
             </div>
 
             <!-- Timeline and Technologies -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px;">
-                <div style="padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
-                    <h3 style="color: #FFC107; margin-bottom: 10px;">⏱️ Timeline</h3>
-                    <p style="margin: 0; color: #fff; font-size: 1.1em; font-weight: bold;">${content.timeline}</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px;">
+                <div style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                    <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">Timeline</div>
+                    <p style="margin: 0; color: rgba(255,255,255,0.86); font-weight: 600;">${content.timeline}</p>
                 </div>
-                <div style="padding: 20px; background: rgba(255, 255, 255, 0.05); border-radius: 8px;">
-                    <h3 style="color: #FFC107; margin-bottom: 10px;">🛠️ Technologies</h3>
-                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                        ${content.tags.map(tag => `<span style="background: #333; color: #ccc; padding: 6px 12px; border-radius: 15px; font-size: 0.85em; border: 1px solid #555;">${tag}</span>`).join('')}
+                <div style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                    <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">Technologies</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        ${content.tags.map(tag => `<span style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.74); padding: 5px 10px; border-radius: 999px; font-size: 0.78em; border: 1px solid rgba(255,255,255,0.12);">${tag}</span>`).join('')}
                     </div>
                 </div>
             </div>
 
             <!-- Key Features -->
-            <div style="margin-bottom: 40px; padding: 25px; background: rgba(76, 175, 80, 0.1); border-radius: 12px;">
-                <h2 style="color: #4CAF50; margin-bottom: 20px; font-size: 1.4em;">🌟 Key Features</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 1.5em;">🧠</span>
-                        <div>
-                            <strong style="color: #fff;">Memory System</strong><br/>
-                            <small style="color: #ccc;">Remembers your personality & preferences</small>
-                        </div>
+            <div style="margin-bottom: 18px; padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px;">Key Features</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px;">
+                    <div>
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Memory System</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Remembers your personality & preferences</small>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 1.5em;">💬</span>
-                        <div>
-                            <strong style="color: #fff;">Emotional Intelligence</strong><br/>
-                            <small style="color: #ccc;">Adapts to your anxiety levels</small>
-                        </div>
+                    <div>
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Emotional Intelligence</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Adapts to your anxiety levels</small>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 1.5em;">🔒</span>
-                        <div>
-                            <strong style="color: #fff;">Safe Space</strong><br/>
-                            <small style="color: #ccc;">Non-judgmental financial guidance</small>
-                        </div>
+                    <div>
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Safe Space</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Non-judgmental financial guidance</small>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 1.5em;">🎯</span>
-                        <div>
-                            <strong style="color: #fff;">Personal Goals</strong><br/>
-                            <small style="color: #ccc;">Budgets that work for your life</small>
-                        </div>
+                    <div>
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Personal Goals</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Budgets that work for your life</small>
                     </div>
                 </div>
             </div>
@@ -219,19 +207,19 @@ function showProjectModal(content, switchToFollowMode) {
                 startOnLoad: false,
                 theme: 'dark',
                 themeVariables: {
-                    primaryColor: '#4CAF50',
-                    primaryTextColor: '#fff',
-                    primaryBorderColor: '#2E7D32',
-                    lineColor: '#4CAF50',
-                    secondaryColor: '#2196F3',
-                    tertiaryColor: '#FF9800',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    mainBkg: 'rgba(0, 0, 0, 0.3)',
-                    secondBkg: 'rgba(255, 255, 255, 0.1)',
-                    textColor: '#fff',
-                    border1: '#666',
-                    border2: '#999',
-                    fontFamily: 'Arial, sans-serif'
+                    primaryColor: '#0d0d10',
+                    primaryTextColor: 'rgba(255,255,255,0.92)',
+                    primaryBorderColor: 'rgba(255,255,255,0.22)',
+                    lineColor: 'rgba(255,255,255,0.22)',
+                    secondaryColor: '#0d0d10',
+                    tertiaryColor: '#0d0d10',
+                    background: 'rgba(255,255,255,0.04)',
+                    mainBkg: 'rgba(12, 12, 14, 0.86)',
+                    secondBkg: 'rgba(255,255,255,0.04)',
+                    textColor: 'rgba(255,255,255,0.92)',
+                    border1: 'rgba(255,255,255,0.14)',
+                    border2: 'rgba(255,255,255,0.22)',
+                    fontFamily: '"IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif'
                 },
                 flowchart: {
                     useMaxWidth: true,
@@ -326,44 +314,46 @@ function showProjectModal(content, switchToFollowMode) {
 
                 const memoryModalContent = document.createElement('div');
                 memoryModalContent.style.cssText = `
-                    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-                    border-radius: 16px;
+                    background: rgba(12, 12, 14, 0.86);
+                    border-radius: 14px;
                     padding: 30px;
                     max-width: 1000px;
                     width: 95%;
                     max-height: 90vh;
                     overflow-y: auto;
-                    border: 3px solid #FFC107;
-                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+                    border: 1px solid rgba(255,255,255,0.14);
+                    box-shadow: 0 30px 80px rgba(0,0,0,0.65);
                     position: relative;
-                    color: #fff;
+                    color: rgba(255,255,255,0.92);
                     margin: 20px;
+                    backdrop-filter: blur(10px);
+                    -webkit-backdrop-filter: blur(10px);
                 `;
 
                 memoryModalContent.innerHTML = `
                     <div style="text-align: center; margin-bottom: 30px;">
-                        <h1 style="color: #FFC107; margin-bottom: 10px; font-size: 2.2em; font-weight: bold;">🧠 Memory Pipeline Flow</h1>
-                        <div style="width: 100px; height: 4px; background: #FFC107; margin: 0 auto; border-radius: 2px;"></div>
-                        <p style="color: #ccc; margin-top: 15px; font-size: 1.1em;">How episodic and semantic memories are created and managed</p>
+                        <h1 style="color: rgba(255,255,255,0.92); margin-bottom: 10px; font-size: 2.2em; font-weight: 650; font-family: 'Fraunces', ui-serif, Georgia, serif; letter-spacing: 0.01em;">Memory Pipeline Flow</h1>
+                        <div style="width: 84px; height: 1px; background: rgba(255,255,255,0.16); margin: 0 auto;"></div>
+                        <p style="color: rgba(255,255,255,0.72); margin-top: 15px; font-size: 1.05em; line-height: 1.65;">How episodic and semantic memories are created and managed</p>
                     </div>
 
                     <!-- Detailed Memory Flowchart -->
                     <div style="margin-bottom: 30px;">
-                        <div class="memory-mermaid" style="width: 100%; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 8px; border: 1px solid #444; min-height: 500px;">
+                        <div class="memory-mermaid" style="width: 100%; background: rgba(255,255,255,0.04); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.10); min-height: 500px;">
                             graph TD
-                                A[💬 User Asks<br/>What is my spending pattern?] --> B[🧠 Memory System<br/>Searches and Retrieves]
-                                B --> C[📝 Injects Context<br/>• You prefer coffee shops over chains<br/>• Last month: $120 dining out<br/>• Goal: Save $500 this month]
+                                A["User Asks<br/>What is my spending pattern?"] --> B["Memory System<br/>Searches and Retrieves"]
+                                B --> C["Injects Context<br/>• You prefer coffee shops over chains<br/>• Last month: $120 dining out<br/>• Goal: Save $500 this month"]
 
-                                C --> D[🎯 Supervisor Agent<br/>Makes Personalized Response]
-                                D --> E[💰 Based on your preferences<br/>I recommend these budget adjustments]
+                                C --> D["Supervisor Agent<br/>Makes Personalized Response"]
+                                D --> E["Based on your preferences<br/>I recommend these budget adjustments"]
 
-                                E --> F[📚 Episodic Memory<br/>Captures This Interaction]
-                                F --> G[🔄 Next Time<br/>Remembers our conversation<br/>about your coffee spending]
+                                E --> F["Episodic Memory<br/>Captures This Interaction"]
+                                F --> G["Next Time<br/>Remembers our conversation<br/>about your coffee spending"]
 
-                                classDef userClass fill:#4CAF50,stroke:#2E7D32,stroke-width:2px,color:white
-                                classDef memoryClass fill:#FFC107,stroke:#FF8F00,stroke-width:2px,color:black
-                                classDef agentClass fill:#2196F3,stroke:#1976D2,stroke-width:2px,color:white
-                                classDef episodicClass fill:#00BCD4,stroke:#0097A7,stroke-width:2px,color:white
+                                classDef userClass fill:#0d0d10,stroke:rgba(255,255,255,0.22),stroke-width:2px,color:rgba(255,255,255,0.92)
+                                classDef memoryClass fill:#0d0d10,stroke:rgba(255,255,255,0.22),stroke-width:2px,color:rgba(255,255,255,0.92)
+                                classDef agentClass fill:#0d0d10,stroke:rgba(255,255,255,0.22),stroke-width:2px,color:rgba(255,255,255,0.92)
+                                classDef episodicClass fill:#0d0d10,stroke:rgba(255,255,255,0.22),stroke-width:2px,color:rgba(255,255,255,0.92)
 
                                 A:::userClass
                                 B:::memoryClass
@@ -376,10 +366,10 @@ function showProjectModal(content, switchToFollowMode) {
                     </div>
 
                     <!-- Impact-Focused Component Explanations -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px;">
-                        <div style="padding: 20px; background: rgba(76, 175, 80, 0.1); border-radius: 8px; border-left: 4px solid #4CAF50;">
-                            <h3 style="color: #4CAF50; margin-bottom: 10px;">🎯 Personalization Impact</h3>
-                            <ul style="color: #ccc; margin: 0; padding-left: 20px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-bottom: 30px;">
+                        <div style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                            <h3 style="color: rgba(255,255,255,0.92); margin-bottom: 10px; font-size: 1.05em; font-weight: 600;">Personalization Impact</h3>
+                            <ul style="color: rgba(255,255,255,0.72); margin: 0; padding-left: 20px; line-height: 1.75;">
                                 <li>Remembers your unique financial preferences</li>
                                 <li>Adapts communication style to your personality</li>
                                 <li>Provides contextually relevant advice</li>
@@ -387,9 +377,9 @@ function showProjectModal(content, switchToFollowMode) {
                             </ul>
                         </div>
 
-                        <div style="padding: 20px; background: rgba(255, 193, 7, 0.1); border-radius: 8px; border-left: 4px solid #FFC107;">
-                            <h3 style="color: #FFC107; margin-bottom: 10px;">🧠 Learning & Growth</h3>
-                            <ul style="color: #ccc; margin: 0; padding-left: 20px;">
+                        <div style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                            <h3 style="color: rgba(255,255,255,0.92); margin-bottom: 10px; font-size: 1.05em; font-weight: 600;">Learning & Growth</h3>
+                            <ul style="color: rgba(255,255,255,0.72); margin: 0; padding-left: 20px; line-height: 1.75;">
                                 <li>Builds knowledge from every conversation</li>
                                 <li>Identifies patterns in your financial behavior</li>
                                 <li>Evolves recommendations based on your progress</li>
@@ -397,9 +387,9 @@ function showProjectModal(content, switchToFollowMode) {
                             </ul>
                         </div>
 
-                        <div style="padding: 20px; background: rgba(33, 150, 243, 0.1); border-radius: 8px; border-left: 4px solid #2196F3;">
-                            <h3 style="color: #2196F3; margin-bottom: 10px;">⚡ Efficiency Gains</h3>
-                            <ul style="color: #ccc; margin: 0; padding-left: 20px;">
+                        <div style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                            <h3 style="color: rgba(255,255,255,0.92); margin-bottom: 10px; font-size: 1.05em; font-weight: 600;">Efficiency Gains</h3>
+                            <ul style="color: rgba(255,255,255,0.72); margin: 0; padding-left: 20px; line-height: 1.75;">
                                 <li>Reduces repetitive explanations</li>
                                 <li>Provides instant context for complex topics</li>
                                 <li>Streamlines ongoing financial discussions</li>
@@ -407,9 +397,9 @@ function showProjectModal(content, switchToFollowMode) {
                             </ul>
                         </div>
 
-                        <div style="padding: 20px; background: rgba(156, 39, 176, 0.1); border-radius: 8px; border-left: 4px solid #9C27B0;">
-                            <h3 style="color: #9C27B0; margin-bottom: 10px;">💝 Trust Building</h3>
-                            <ul style="color: #ccc; margin: 0; padding-left: 20px;">
+                        <div style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                            <h3 style="color: rgba(255,255,255,0.92); margin-bottom: 10px; font-size: 1.05em; font-weight: 600;">Trust Building</h3>
+                            <ul style="color: rgba(255,255,255,0.72); margin: 0; padding-left: 20px; line-height: 1.75;">
                                 <li>Shows genuine understanding of your situation</li>
                                 <li>Maintains consistency across conversations</li>
                                 <li>Demonstrates care for your financial well-being</li>
@@ -421,19 +411,25 @@ function showProjectModal(content, switchToFollowMode) {
 
                     <div style="text-align: center; margin-top: 30px;">
                         <button id="close-memory-modal-btn" style="
-                            background: linear-gradient(135deg, #FFC107, #FF8F00);
-                            color: #000;
-                            border: none;
-                            padding: 15px 40px;
-                            border-radius: 12px;
+                            background: rgba(255,255,255,0.92);
+                            color: rgba(0,0,0,0.92);
+                            border: 1px solid rgba(255,255,255,0.10);
+                            padding: 12px 18px;
+                            border-radius: 999px;
                             cursor: pointer;
-                            font-size: 18px;
-                            font-weight: bold;
-                            transition: all 0.3s;
+                            font-size: 12px;
+                            font-weight: 600;
+                            transition: transform 160ms ease, opacity 160ms ease;
                             min-width: 120px;
-                            min-height: 50px;
-                            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
-                        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(255, 193, 7, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(255, 193, 7, 0.3)';">Close Memory Details</button>
+                            min-height: 42px;
+                            opacity: 0.95;
+                            -webkit-tap-highlight-color: transparent;
+                            -webkit-touch-callout: none;
+                            -webkit-user-select: none;
+                            -moz-user-select: none;
+                            -ms-user-select: none;
+                            user-select: none;
+                        ">Close</button>
                     </div>
                 `;
 
@@ -447,6 +443,14 @@ function showProjectModal(content, switchToFollowMode) {
                 };
 
                 closeMemoryBtn.onclick = closeMemoryModal;
+                closeMemoryBtn.addEventListener('mouseenter', () => {
+                    closeMemoryBtn.style.opacity = '1';
+                    closeMemoryBtn.style.transform = 'translateY(-1px)';
+                });
+                closeMemoryBtn.addEventListener('mouseleave', () => {
+                    closeMemoryBtn.style.opacity = '0.95';
+                    closeMemoryBtn.style.transform = 'translateY(0)';
+                });
 
                 memoryModal.onclick = (e) => {
                     if (e.target === memoryModal) {

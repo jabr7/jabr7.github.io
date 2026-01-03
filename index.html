@@ -3,7 +3,32 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-			<title>Ocean Portfolio - Joaquin Bonifacino</title>
+	
+	<!-- SEO Meta Tags -->
+	<meta name="description" content="Joaquin Bonifacino - Applied AI Engineer. Interactive 3D portfolio showcasing AI/ML projects including multi-agent systems, RAG pipelines, and production AI solutions.">
+	<meta name="keywords" content="AI Engineer, Machine Learning, Applied AI, LLM, RAG, Multi-Agent Systems, Portfolio">
+	<meta name="author" content="Joaquin Bonifacino">
+	
+	<!-- OpenGraph Tags -->
+	<meta property="og:title" content="Joaquin Bonifacino - Applied AI Engineer Portfolio">
+	<meta property="og:description" content="Interactive 3D ocean portfolio showcasing AI/ML projects including multi-agent systems, RAG pipelines, and production AI solutions.">
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="https://jabr7.github.io">
+	<meta property="og:site_name" content="Joaquin Bonifacino Portfolio">
+	
+	<!-- Twitter Card Tags -->
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Joaquin Bonifacino - Applied AI Engineer Portfolio">
+	<meta name="twitter:description" content="Interactive 3D ocean portfolio showcasing AI/ML projects including multi-agent systems, RAG pipelines, and production AI solutions.">
+	
+	<title>Joaquin Bonifacino - Applied AI Engineer Portfolio</title>
+	
+	<!-- Favicon -->
+	<link rel="icon" type="image/svg+xml" href="./favicon.svg?v=2">
+	<link rel="icon" type="image/png" sizes="32x32" href="./favicon.svg?v=2">
+	<link rel="icon" type="image/png" sizes="16x16" href="./favicon.svg?v=2">
+	<link rel="apple-touch-icon" href="./favicon.svg?v=2">
+	
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -86,6 +111,26 @@
 		}
 		#profile-card a { color: var(--ui-text); text-decoration: none; font-weight: 500; font-size: 12px; opacity: 0.82; }
 		#profile-card a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 3px; }
+		
+		.email-copy {
+			cursor: pointer;
+			color: var(--ui-text);
+			text-decoration: none;
+			font-weight: 500;
+			font-size: 12px;
+			opacity: 0.82;
+			position: relative;
+			display: inline-block;
+		}
+		.email-copy:hover { 
+			opacity: 1; 
+			text-decoration: underline;
+			text-underline-offset: 3px;
+		}
+		.email-copy.copied {
+			opacity: 1;
+			color: rgba(255,255,255,0.95);
+		}
 
 		.profile-name{
 			font-family: "Fraunces", ui-serif, Georgia, serif;
@@ -103,42 +148,6 @@
 			margin-bottom: 10px;
 		}
 
-		#contact-cta {
-			position: fixed;
-			bottom: 20px;
-			right: 20px;
-			background: var(--ui-panel);
-			color: var(--ui-text);
-			border: 1px solid var(--ui-border);
-			padding: 10px 14px;
-			border-radius: 999px;
-			cursor: pointer;
-			font-size: 12px;
-			font-weight: 500;
-			z-index: 100;
-			box-shadow: var(--ui-shadow);
-			transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, opacity 160ms ease;
-			text-decoration: none;
-			display: inline-block;
-			backdrop-filter: blur(10px);
-			-webkit-backdrop-filter: blur(10px);
-		}
-		#contact-cta:hover {
-			transform: translateY(-1px);
-			background: var(--ui-panel-strong);
-			border-color: var(--ui-border-strong);
-		}
-		#contact-cta:active {
-			transform: translateY(0);
-		}
-		@media (max-width: 768px) {
-			#contact-cta {
-				bottom: 10px;
-				right: 10px;
-				padding: 10px 20px;
-				font-size: 13px;
-			}
-		}
 
 		/* Mobile controls styling */
 		#mobile-controls {
@@ -236,15 +245,16 @@
 		<div id="profile-card">
 			<div class="profile-name">Joaquin Bonifacino</div>
 			<div class="profile-role">Applied AI Engineer</div>
-			<div style="display: flex; flex-wrap: wrap; gap: 12px;">
+			<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
 				<a href="https://linkedin.com/in/joaquin-bonifacino" target="_blank">LinkedIn</a>
 				<a href="https://github.com/jabrPromtior" target="_blank">GitHub (Work)</a>
 				<a href="https://github.com/jabr7" target="_blank">GitHub (Personal)</a>
 			</div>
+			<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 8px;">
+				<a href="#" class="email-copy" id="email-copy" data-email="joaquin.bonifacino@example.com">Email</a>
+				<a href="./resume.pdf" download="Joaquin_Bonifacino_Resume.pdf">Resume</a>
+			</div>
 		</div>
-
-		<!-- Contact CTA Button -->
-		<a id="contact-cta" href="https://linkedin.com/in/joaquin-bonifacino" target="_blank">Contact</a>
 
 		<!-- Simple LoFi Music Toggle -->
 		<button id="music-toggle" class="hud-button" style="position: absolute; top: 20px; left: 150px; z-index: 100;">Music</button>
@@ -303,8 +313,58 @@
 
 			console.log('LoFi music ready. Click Music to start.');
 		});
+
+		// Email copy-to-clipboard functionality
+		document.addEventListener('DOMContentLoaded', function() {
+			const emailCopy = document.getElementById('email-copy');
+			if (emailCopy) {
+				emailCopy.addEventListener('click', async function(e) {
+					e.preventDefault();
+					const email = this.getAttribute('data-email');
+					try {
+						await navigator.clipboard.writeText(email);
+						const originalText = this.textContent;
+						this.textContent = 'Email (Copied!)';
+						setTimeout(() => {
+							this.textContent = originalText;
+						}, 2000);
+					} catch (err) {
+						// Fallback for older browsers
+						const textArea = document.createElement('textarea');
+						textArea.value = email;
+						textArea.style.position = 'fixed';
+						textArea.style.opacity = '0';
+						document.body.appendChild(textArea);
+						textArea.select();
+						try {
+							document.execCommand('copy');
+							const originalText = this.textContent;
+							this.textContent = 'Email (Copied!)';
+							setTimeout(() => {
+								this.textContent = originalText;
+							}, 2000);
+						} catch (fallbackErr) {
+							alert('Email: ' + email);
+						}
+						document.body.removeChild(textArea);
+					}
+				});
+			}
+		});
 	</script>
 
-	<script type="module" src="./main.js"></script>
+	<script type="module" src="./main.js?v=2"></script>
+	
+	<!-- Force cache refresh -->
+	<script>
+		// Clear any cached versions
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.getRegistrations().then(function(registrations) {
+				for(let registration of registrations) {
+					registration.unregister();
+				}
+			});
+		}
+	</script>
 </body>
 </html>
