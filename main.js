@@ -613,6 +613,26 @@ function createMobileControls() {
     controlsContainer.appendChild(dpadContainer);
     controlsContainer.appendChild(actionContainer);
     document.body.appendChild(controlsContainer);
+
+    // Boost button (Shift equivalent) on bottom-right
+    const boostContainer = document.createElement('div');
+    boostContainer.style.cssText = `
+        position: fixed;
+        bottom: 60px;
+        right: 60px;
+        z-index: 100;
+        pointer-events: auto;
+    `;
+
+    const boostBtn = createControlButton('⇧', 'boost-btn', () => {
+        keys.boost = true;
+        if (navigator.vibrate) navigator.vibrate(40);
+    }, () => {
+        keys.boost = false;
+    }, 100);
+
+    boostContainer.appendChild(boostBtn);
+    document.body.appendChild(boostContainer);
 }
 
 function createControlButton(text, className, onPress, onRelease = null, size = 50) {
