@@ -351,7 +351,7 @@ scene.add(dots);
 // Import and initialize boat system
 import { initBoat, updateBoat, boatPosition, boatRotation, boatGeometry, keys } from './boat.js';
 import { initWaveSampling } from './wave-sampling.js';
-import { initBuoys, updateBuoys, interactWithBuoy, getCurrentHighlightedBuoy, updateTextSprites } from './buoy.js';
+import { initBuoys, updateBuoys, interactWithBuoy, getCurrentHighlightedBuoy, updateTextSprites, buoys } from './buoy.js';
 import { showControlsModal, showWelcomeModal } from './modal.js';
 import { initTrails, updateTrails } from './trails.js';
 
@@ -803,12 +803,6 @@ const readyCheckInterval = setInterval(() => {
 		clearInterval(readyCheckInterval);
 	}
 }, 100);
-
-// Also check after a short delay
-setTimeout(() => {
-	checkSceneReady();
-	clearInterval(readyCheckInterval);
-}, 2000);
 
 window.addEventListener('resize', () => {
 	camera.aspect = window.innerWidth / window.innerHeight;
