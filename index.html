@@ -15,11 +15,15 @@
 	<meta property="og:type" content="website">
 	<meta property="og:url" content="https://jabr7.github.io">
 	<meta property="og:site_name" content="Joaquin Bonifacino Portfolio">
+	<meta property="og:image" content="https://jabr7.github.io/og-image.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
 	
 	<!-- Twitter Card Tags -->
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="Joaquin Bonifacino - Applied AI Engineer Portfolio">
 	<meta name="twitter:description" content="Interactive 3D ocean portfolio showcasing AI/ML projects including multi-agent systems, RAG pipelines, and production AI solutions.">
+	<meta name="twitter:image" content="https://jabr7.github.io/og-image.png">
 	
 	<title>Joaquin Bonifacino - Applied AI Engineer Portfolio</title>
 	
@@ -235,9 +239,159 @@
 			}
 		}
 
+		/* Minimalist Loader */
+		#loader {
+			position: fixed;
+			inset: 0;
+			background: var(--ui-bg);
+			z-index: 10000;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			backdrop-filter: blur(20px);
+			-webkit-backdrop-filter: blur(20px);
+			opacity: 1;
+			transition: opacity 800ms ease-out, visibility 800ms ease-out;
+			pointer-events: none;
+		}
+
+		#loader.hidden {
+			opacity: 0;
+			visibility: hidden;
+		}
+
+		.loader-content {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 24px;
+		}
+
+		.loader-wave {
+			width: 2px;
+			height: 48px;
+			background: var(--ui-text);
+			opacity: 0.6;
+			position: relative;
+			animation: wave-pulse 2400ms ease-in-out infinite;
+		}
+
+		.loader-wave::before,
+		.loader-wave::after {
+			content: '';
+			position: absolute;
+			left: 0;
+			width: 2px;
+			background: var(--ui-text);
+			opacity: 0.6;
+		}
+
+		.loader-wave::before {
+			height: 36px;
+			left: -12px;
+			animation: wave-pulse 2400ms ease-in-out infinite;
+			animation-delay: -800ms;
+		}
+
+		.loader-wave::after {
+			height: 40px;
+			left: 12px;
+			animation: wave-pulse 2400ms ease-in-out infinite;
+			animation-delay: -400ms;
+		}
+
+		@keyframes wave-pulse {
+			0%, 100% {
+				transform: scaleY(0.4) translateY(0);
+				opacity: 0.3;
+			}
+			50% {
+				transform: scaleY(1) translateY(-4px);
+				opacity: 0.8;
+			}
+		}
+
+		.loader-text {
+			font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+			font-size: 11px;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			color: var(--ui-muted);
+			opacity: 0;
+			animation: fade-in-delayed 1200ms ease-out forwards;
+		}
+
+		@keyframes fade-in-delayed {
+			0% {
+				opacity: 0;
+			}
+			100% {
+				opacity: 1;
+			}
+		}
+
+		/* Floating Hint Text */
+		#hint-text {
+			position: fixed;
+			top: 20%;
+			left: 50%;
+			transform: translateX(-50%);
+			font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+			font-size: 14px;
+			letter-spacing: 0.1em;
+			color: var(--ui-text);
+			background: var(--ui-panel-strong);
+			padding: 14px 24px;
+			border-radius: var(--ui-radius);
+			border: 1px solid var(--ui-border-strong);
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
+			opacity: 0;
+			visibility: hidden;
+			transition: opacity 600ms ease-out, visibility 600ms ease-out;
+			pointer-events: none;
+			z-index: 10001;
+			font-weight: 500;
+		}
+
+		#hint-text.visible {
+			opacity: 1;
+			visibility: visible;
+		}
+
+		#hint-text.wave-animate {
+			animation: wave-float 3000ms ease-in-out infinite;
+		}
+
+		@keyframes wave-float {
+			0%, 100% {
+				transform: translateX(-50%) translateY(0) rotate(0deg);
+			}
+			25% {
+				transform: translateX(-50%) translateY(-4px) rotate(0.5deg);
+			}
+			50% {
+				transform: translateX(-50%) translateY(-2px) rotate(0deg);
+			}
+			75% {
+				transform: translateX(-50%) translateY(-6px) rotate(-0.5deg);
+			}
+		}
+
 	</style>
 </head>
 <body>
+		<!-- Minimalist Loader -->
+		<div id="loader">
+			<div class="loader-content">
+				<div class="loader-wave"></div>
+				<div class="loader-text">Loading</div>
+			</div>
+		</div>
+
+		<!-- Floating Hint Text -->
+		<div id="hint-text">Sail to buoys to explore</div>
+
 			<div id="hud" style="position: relative;">
 			<button id="info-btn" class="hud-button" style="position: absolute; top: 10px; left: 10px; z-index: 100;">Controls</button>
 		</div>
@@ -251,8 +405,8 @@
 				<a href="https://github.com/jabr7" target="_blank">GitHub (Personal)</a>
 			</div>
 			<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 8px;">
-				<a href="#" class="email-copy" id="email-copy" data-email="joaquin.bonifacino@example.com">Email</a>
-				<a href="./resume.pdf" download="Joaquin_Bonifacino_Resume.pdf">Resume</a>
+				<a href="#" class="email-copy" id="email-copy" data-email="joaquinbonifacino7@gmail.com">Email</a>
+				<a href="./Joaquin Bonifacino's Resume.pdf" download="Joaquin_Bonifacino_Resume.pdf">Resume</a>
 			</div>
 		</div>
 
@@ -354,6 +508,105 @@
 	</script>
 
 	<script type="module" src="./main.js?v=2"></script>
+	
+	<!-- Loader and Hint Text Logic -->
+	<script>
+		// Loader fade-out logic
+		let loaderHidden = false;
+		function hideLoader() {
+			if (loaderHidden) return;
+			const loader = document.getElementById('loader');
+			if (loader) {
+				loaderHidden = true;
+				loader.classList.add('hidden');
+				setTimeout(() => {
+					loader.remove();
+				}, 800);
+			}
+		}
+
+		// Listen for scene ready event from main.js
+		window.addEventListener('sceneReady', () => {
+			hideLoader();
+		});
+
+		// Fallback: hide loader after maximum expected load time
+		setTimeout(() => {
+			hideLoader();
+		}, 5000);
+
+		// Hint text logic
+		let hintShown = false;
+		let hintTimeout = null;
+		let interactionDetected = false;
+
+		function showHint() {
+			if (hintShown || interactionDetected) return;
+			
+			// Wait for loader to be gone before showing hint
+			const loader = document.getElementById('loader');
+			if (loader && !loader.classList.contains('hidden')) {
+				// Retry after loader is gone
+				setTimeout(showHint, 500);
+				return;
+			}
+
+			const hint = document.getElementById('hint-text');
+			if (hint) {
+				console.log('Showing hint text');
+				hint.classList.add('visible', 'wave-animate');
+				hintShown = true;
+				
+				// Auto-hide after 12 seconds
+				hintTimeout = setTimeout(() => {
+					hideHint();
+				}, 12000);
+
+				// Only attach interaction listeners AFTER hint is shown
+				setupInteractionListeners();
+			} else {
+				console.error('Hint text element not found');
+			}
+		}
+
+		function hideHint() {
+			const hint = document.getElementById('hint-text');
+			if (hint) {
+				hint.classList.remove('visible', 'wave-animate');
+				if (hintTimeout) {
+					clearTimeout(hintTimeout);
+					hintTimeout = null;
+				}
+			}
+		}
+
+		function setupInteractionListeners() {
+			// Hide hint on user interaction (only attach once)
+			const hideOnInteraction = () => {
+				if (hintShown) {
+					interactionDetected = true;
+					hideHint();
+				}
+			};
+
+			document.addEventListener('keydown', hideOnInteraction, { once: false });
+			document.addEventListener('mousedown', hideOnInteraction, { once: false });
+			document.addEventListener('touchstart', hideOnInteraction, { once: false });
+		}
+
+		// Show hint after 5 seconds (wait for loader to be gone and scene to be ready)
+		setTimeout(() => {
+			showHint();
+		}, 5000);
+
+		// Hide hint when modal opens
+		const observer = new MutationObserver((mutations) => {
+			if (document.querySelector('.swal2-container')) {
+				hideHint();
+			}
+		});
+		observer.observe(document.body, { childList: true, subtree: true });
+	</script>
 	
 	<!-- Force cache refresh -->
 	<script>

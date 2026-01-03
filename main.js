@@ -787,6 +787,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
 animate();
 
+// Dispatch scene ready event after initial render
+let sceneReadyDispatched = false;
+function checkSceneReady() {
+	if (!sceneReadyDispatched && boat && buoys.length > 0) {
+		sceneReadyDispatched = true;
+		window.dispatchEvent(new CustomEvent('sceneReady'));
+	}
+}
+
+// Check periodically until scene is ready
+const readyCheckInterval = setInterval(() => {
+	checkSceneReady();
+	if (sceneReadyDispatched) {
+		clearInterval(readyCheckInterval);
+	}
+}, 100);
+
+// Also check after a short delay
+setTimeout(() => {
+	checkSceneReady();
+	clearInterval(readyCheckInterval);
+}, 2000);
+
 window.addEventListener('resize', () => {
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
