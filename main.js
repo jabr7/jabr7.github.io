@@ -425,6 +425,8 @@ if (fullscreenSupported()) {
             } else {
                 await requestFullscreen();
             }
+        } catch (err) {
+            console.error('Fullscreen request failed:', err);
         } finally {
             updateFullscreenBtnLabel();
         }
@@ -861,15 +863,15 @@ const buoySystem = initBuoys(scene, THREE);
 if (isMobile) {
     // Prevent default touch behaviors that interfere with 3D scene
     document.addEventListener('touchstart', (e) => {
-        // Only prevent if not touching mobile controls
-        if (!e.target.closest('#mobile-controls')) {
+        // Only prevent if not interacting with UI
+        if (!e.target.closest('#mobile-controls, #fullscreen-btn, #info-btn, .swal2-container, .swal2-popup')) {
             e.preventDefault();
         }
     }, { passive: false });
 
     document.addEventListener('touchmove', (e) => {
         // Allow touchmove on mobile controls but prevent others
-        if (!e.target.closest('#mobile-controls')) {
+        if (!e.target.closest('#mobile-controls, .swal2-container, .swal2-popup')) {
             e.preventDefault();
         }
     }, { passive: false });
