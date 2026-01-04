@@ -162,7 +162,7 @@
 
 		/* Mobile controls styling */
 		#mobile-controls {
-			font-family: 'Arial', sans-serif;
+			font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 		}
 
 		#mobile-controls button:active {
@@ -206,6 +206,11 @@
 
 		/* Mobile SweetAlert2 fixes */
 		@media (max-width: 768px) {
+			#profile-card,
+			#music-toggle {
+				display: none !important;
+			}
+
 			.swal2-popup {
 				max-height: 90vh !important;
 				overflow-y: auto !important;

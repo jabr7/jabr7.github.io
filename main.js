@@ -565,159 +565,183 @@ const boat = initBoat(scene, THREE);
 // Initialize camera in follow mode (after boat is ready)
 switchCameraMode(CAMERA_MODES.FOLLOW);
 
-// Mobile control functions - Clean D-pad style
+// Mobile control functions
 function createMobileControls() {
-    // Create control container
+    const controlsContainerExisting = document.getElementById('mobile-controls');
+    if (controlsContainerExisting) controlsContainerExisting.remove();
+
     const controlsContainer = document.createElement('div');
     controlsContainer.id = 'mobile-controls';
     controlsContainer.style.cssText = `
         position: fixed;
-        bottom: 30px;
-        left: 30px;
-        z-index: 100;
+        inset: 0;
+        z-index: 900;
         pointer-events: none;
     `;
 
-    // D-pad container (4 directional buttons in a cross pattern)
-    const dpadContainer = document.createElement('div');
-    dpadContainer.style.cssText = `
-        position: relative;
-        width: 180px;
-        height: 180px;
+    const joystickWrap = document.createElement('div');
+    joystickWrap.style.cssText = `
+        position: fixed;
+        left: calc(18px + env(safe-area-inset-left, 0px));
+        bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+        width: 160px;
+        height: 160px;
         pointer-events: auto;
+        touch-action: none;
     `;
 
-    // Center point for positioning
-    const centerX = 90;
-    const centerY = 90;
-    const buttonSize = 50;
-    const spacing = 55;
+    const joystickBase = document.createElement('div');
+    joystickBase.style.cssText = `
+        position: absolute;
+        inset: 0;
+        border-radius: 999px;
+        background: var(--ui-panel);
+        border: 1px solid var(--ui-border-strong);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    `;
 
-    // Create directional buttons
-    const directions = [
-        { key: 'forward', symbol: '↑', x: centerX - buttonSize/2, y: centerY - spacing - buttonSize/2 },
-        { key: 'backward', symbol: '↓', x: centerX - buttonSize/2, y: centerY + spacing - buttonSize/2 },
-        { key: 'left', symbol: '←', x: centerX - spacing - buttonSize/2, y: centerY - buttonSize/2 },
-        { key: 'right', symbol: '→', x: centerX + spacing - buttonSize/2, y: centerY - buttonSize/2 }
-    ];
+    const joystickThumb = document.createElement('div');
+    joystickThumb.style.cssText = `
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 62px;
+        height: 62px;
+        transform: translate(-50%, -50%);
+        border-radius: 999px;
+        background: var(--ui-panel-strong);
+        border: 1px solid var(--ui-border-strong);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: transform 90ms ease;
+        will-change: transform;
+    `;
 
-    directions.forEach(dir => {
-        const button = document.createElement('button');
-        button.textContent = dir.symbol;
-        button.style.cssText = `
-            position: absolute;
-            left: ${dir.x}px;
-            top: ${dir.y}px;
-            width: ${buttonSize}px;
-            height: ${buttonSize}px;
-            border: 3px solid #fff;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.7);
-            color: #fff;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s ease;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        `;
+    joystickWrap.appendChild(joystickBase);
+    joystickWrap.appendChild(joystickThumb);
 
-        // Add event listeners
-        button.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            keys[dir.key] = true;
-            button.style.transform = 'scale(0.9)';
-            button.style.background = 'rgba(255, 255, 255, 0.3)';
-            if (navigator.vibrate) navigator.vibrate(40);
-        });
-
-        button.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            keys[dir.key] = false;
-            button.style.transform = 'scale(1)';
-            button.style.background = 'rgba(0, 0, 0, 0.7)';
-        });
-
-        button.addEventListener('touchcancel', (e) => {
-            keys[dir.key] = false;
-            button.style.transform = 'scale(1)';
-            button.style.background = 'rgba(0, 0, 0, 0.7)';
-        });
-
-        dpadContainer.appendChild(button);
-    });
-
-    // Action buttons (right side)
     const actionContainer = document.createElement('div');
     actionContainer.style.cssText = `
-        position: absolute;
-        left: 220px;
-        top: 50px;
+        position: fixed;
+        right: calc(18px + env(safe-area-inset-right, 0px));
+        bottom: calc(18px + env(safe-area-inset-bottom, 0px));
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        gap: 10px;
         pointer-events: auto;
     `;
 
-    // Interact button
-    const interactBtn = createControlButton('🎯', 'interact-btn', () => {
+    const interactBtn = createControlButton('E', 'interact-btn', () => {
         const event = new KeyboardEvent('keydown', { code: 'KeyE' });
         document.dispatchEvent(event);
         if (navigator.vibrate) navigator.vibrate(80);
     }, null, 60);
 
-    // Camera toggle button
-    const cameraBtn = createControlButton('📹', 'camera-btn', () => {
+    const cameraBtn = createControlButton('C', 'camera-btn', () => {
         const event = new KeyboardEvent('keydown', { code: 'KeyC' });
         document.dispatchEvent(event);
         if (navigator.vibrate) navigator.vibrate(60);
     }, null, 60);
-
-    actionContainer.appendChild(interactBtn);
-    actionContainer.appendChild(cameraBtn);
-
-    controlsContainer.appendChild(dpadContainer);
-    controlsContainer.appendChild(actionContainer);
-    document.body.appendChild(controlsContainer);
-
-    // Boost button (Shift equivalent) on bottom-right
-    const boostContainer = document.createElement('div');
-    boostContainer.style.cssText = `
-        position: fixed;
-        bottom: 60px;
-        right: 60px;
-        z-index: 100;
-        pointer-events: auto;
-    `;
 
     const boostBtn = createControlButton('⇧', 'boost-btn', () => {
         keys.boost = true;
         if (navigator.vibrate) navigator.vibrate(40);
     }, () => {
         keys.boost = false;
-    }, 100);
+    }, 76);
 
-    boostContainer.appendChild(boostBtn);
-    document.body.appendChild(boostContainer);
+    actionContainer.appendChild(interactBtn);
+    actionContainer.appendChild(cameraBtn);
+    actionContainer.appendChild(boostBtn);
+
+    controlsContainer.appendChild(joystickWrap);
+    controlsContainer.appendChild(actionContainer);
+    document.body.appendChild(controlsContainer);
+
+    const joystickState = {
+        pointerId: null,
+        centerX: 0,
+        centerY: 0,
+        radius: 64,
+        deadzone: 10
+    };
+
+    function setJoystick(throttle, steer) {
+        keys.throttle = throttle;
+        keys.steer = steer;
+    }
+
+    function resetJoystick() {
+        joystickThumb.style.transform = 'translate(-50%, -50%)';
+        setJoystick(0, 0);
+    }
+
+    joystickWrap.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        joystickWrap.setPointerCapture(e.pointerId);
+        joystickState.pointerId = e.pointerId;
+        const rect = joystickWrap.getBoundingClientRect();
+        joystickState.centerX = rect.left + rect.width * 0.5;
+        joystickState.centerY = rect.top + rect.height * 0.5;
+    });
+
+    joystickWrap.addEventListener('pointermove', (e) => {
+        if (joystickState.pointerId !== e.pointerId) return;
+        e.preventDefault();
+        const dx = e.clientX - joystickState.centerX;
+        const dy = e.clientY - joystickState.centerY;
+        const dist = Math.hypot(dx, dy);
+        const clamped = Math.min(dist, joystickState.radius);
+
+        const angleX = dist > 0.0001 ? dx / dist : 0;
+        const angleY = dist > 0.0001 ? dy / dist : 0;
+
+        if (clamped <= joystickState.deadzone) {
+            joystickThumb.style.transform = `translate(-50%, -50%)`;
+            setJoystick(0, 0);
+            return;
+        }
+
+        const scaled = (clamped - joystickState.deadzone) / (joystickState.radius - joystickState.deadzone);
+        const tx = angleX * clamped;
+        const ty = angleY * clamped;
+        joystickThumb.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px))`;
+
+        const steer = angleX * scaled;
+        const throttle = -angleY * scaled;
+        setJoystick(throttle, steer);
+    });
+
+    const endJoystick = (e) => {
+        if (joystickState.pointerId !== e.pointerId) return;
+        e.preventDefault();
+        joystickState.pointerId = null;
+        resetJoystick();
+    };
+
+    joystickWrap.addEventListener('pointerup', endJoystick);
+    joystickWrap.addEventListener('pointercancel', endJoystick);
+    window.addEventListener('blur', () => resetJoystick());
 }
 
 function createControlButton(text, className, onPress, onRelease = null, size = 50) {
     const button = document.createElement('button');
     button.textContent = text;
     button.className = className;
+    button.type = 'button';
     button.style.cssText = `
         width: ${size}px;
         height: ${size}px;
-        border: 3px solid #fff;
-        border-radius: 50%;
-        background: rgba(0, 0, 0, 0.7);
-        color: #fff;
-        font-size: ${size * 0.4}px;
-        font-weight: bold;
+        border: 1px solid var(--ui-border-strong);
+        border-radius: 999px;
+        background: var(--ui-panel);
+        color: var(--ui-text);
+        font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        font-size: ${Math.round(size * 0.34)}px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -726,26 +750,30 @@ function createControlButton(text, className, onPress, onRelease = null, size = 
         user-select: none;
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     `;
 
-    button.addEventListener('touchstart', (e) => {
+    const press = (e) => {
         e.preventDefault();
-        button.style.transform = 'scale(0.9)';
-        button.style.background = 'rgba(255, 255, 255, 0.3)';
+        button.style.transform = 'translateY(1px)';
+        button.style.background = 'var(--ui-panel-strong)';
         if (onPress) onPress();
-    });
+    };
 
-    button.addEventListener('touchend', (e) => {
+    const release = (e) => {
         e.preventDefault();
-        button.style.transform = 'scale(1)';
-        button.style.background = 'rgba(0, 0, 0, 0.7)';
+        button.style.transform = 'translateY(0)';
+        button.style.background = 'var(--ui-panel)';
         if (onRelease) onRelease();
-    });
+    };
 
-    button.addEventListener('touchcancel', (e) => {
-        button.style.transform = 'scale(1)';
-        button.style.background = 'rgba(0, 0, 0, 0.7)';
-        if (onRelease) onRelease();
+    button.addEventListener('pointerdown', press);
+    button.addEventListener('pointerup', release);
+    button.addEventListener('pointercancel', release);
+    button.addEventListener('pointerleave', (e) => {
+        if (e.buttons !== 1) return;
+        release(e);
     });
 
     return button;
@@ -754,21 +782,11 @@ function createControlButton(text, className, onPress, onRelease = null, size = 
 function updateMobileHUD() {
     const hud = document.getElementById('hud');
     if (hud) {
-        // Preserve original positioning for info button
-        hud.style.position = 'relative';
-        hud.style.fontSize = '11px';
-        hud.style.bottom = '220px';
-        hud.style.top = 'auto';
-        hud.style.left = '10px';
-        hud.style.right = '10px';
-        hud.style.textAlign = 'center';
-
-        // Ensure info button stays visible and properly positioned
         const infoBtn = document.getElementById('info-btn');
         if (infoBtn) {
             infoBtn.style.position = 'fixed';
-            infoBtn.style.top = '10px';
-            infoBtn.style.left = '10px';
+            infoBtn.style.top = 'calc(10px + env(safe-area-inset-top, 0px))';
+            infoBtn.style.left = 'calc(10px + env(safe-area-inset-left, 0px))';
             infoBtn.style.zIndex = '1000';
         }
     }

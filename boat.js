@@ -19,7 +19,9 @@ export const keys = {
 	backward: false,
 	left: false,
 	right: false,
-	boost: false
+	boost: false,
+	throttle: 0,
+	steer: 0
 };
 
 // Initialize boat system
@@ -168,20 +170,20 @@ export function updateBoat(time, amplitude, THREE) {
 	// Handle boat controls
 	let currentSpeed = boatSpeed;
 	if (keys.boost) currentSpeed *= 1.8; // Reduced boost multiplier for better control
+	const throttle = Math.abs(keys.throttle) > 0.0001 ? keys.throttle : (keys.forward ? 1 : 0) + (keys.backward ? -1 : 0);
+	const steer = Math.abs(keys.steer) > 0.0001 ? keys.steer : (keys.right ? 1 : 0) + (keys.left ? -1 : 0);
 
-	if (keys.forward) {
-		boatVelocity.x -= Math.sin(boatRotation) * currentSpeed;
-		boatVelocity.z -= Math.cos(boatRotation) * currentSpeed;
+	if (throttle > 0) {
+		boatVelocity.x -= Math.sin(boatRotation) * currentSpeed * throttle;
+		boatVelocity.z -= Math.cos(boatRotation) * currentSpeed * throttle;
 	}
-	if (keys.backward) {
-		boatVelocity.x += Math.sin(boatRotation) * currentSpeed * 0.6;
-		boatVelocity.z += Math.cos(boatRotation) * currentSpeed * 0.6;
+	if (throttle < 0) {
+		const rev = Math.abs(throttle);
+		boatVelocity.x += Math.sin(boatRotation) * currentSpeed * 0.6 * rev;
+		boatVelocity.z += Math.cos(boatRotation) * currentSpeed * 0.6 * rev;
 	}
-	if (keys.left) {
-		boatRotation += boatTurnSpeed;
-	}
-	if (keys.right) {
-		boatRotation -= boatTurnSpeed;
+	if (Math.abs(steer) > 0.0001) {
+		boatRotation -= boatTurnSpeed * steer;
 	}
 
 	// Calculate boat forward direction from its transformation matrix
