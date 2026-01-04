@@ -326,7 +326,6 @@ export function initBuoys(scene, THREE) {
             scene.add(buoyGroup);
         });
     }, (progress) => {
-        console.log('Buoy loading progress:', (progress.loaded / progress.total * 100) + '%');
     }, (error) => {
         console.error('Error loading buoy model:', error);
         console.log('Falling back to simple geometry buoys');

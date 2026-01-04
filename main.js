@@ -863,15 +863,21 @@ const buoySystem = initBuoys(scene, THREE);
 if (isMobile) {
     // Prevent default touch behaviors that interfere with 3D scene
     document.addEventListener('touchstart', (e) => {
-        // Only prevent if not interacting with UI
-        if (!e.target.closest('#mobile-controls, #fullscreen-btn, #info-btn, .swal2-container, .swal2-popup')) {
+        // Only prevent if interacting with the 3D canvas (keep UI taps working)
+        const isUiTarget = Boolean(
+            e.target.closest(
+                '#mobile-controls, #fullscreen-btn, #info-btn, #profile-card, #music-toggle, #project-modal, #controls-modal, #welcome-modal, #memory-flowchart-modal, .hud-button, .swal2-container, .swal2-popup, a, button'
+            )
+        );
+
+        if (!isUiTarget) {
             e.preventDefault();
         }
     }, { passive: false });
 
     document.addEventListener('touchmove', (e) => {
         // Allow touchmove on mobile controls but prevent others
-        if (!e.target.closest('#mobile-controls, .swal2-container, .swal2-popup')) {
+        if (!e.target.closest('#mobile-controls, #project-modal, #controls-modal, #welcome-modal, #memory-flowchart-modal, .swal2-container, .swal2-popup')) {
             e.preventDefault();
         }
     }, { passive: false });

@@ -22,6 +22,9 @@ function showProjectModal(content, switchToFollowMode) {
         z-index: 1000;
         font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
     `;
 
     // Create modal content - much larger for the special project
@@ -37,6 +40,9 @@ function showProjectModal(content, switchToFollowMode) {
         width: ${modalWidth};
         max-height: 90vh;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
         border: 1px solid rgba(255,255,255,0.14);
         box-shadow: 0 30px 80px rgba(0,0,0,0.65);
         position: relative;
@@ -310,6 +316,9 @@ function showProjectModal(content, switchToFollowMode) {
                     z-index: 2000;
                     font-family: 'Arial', sans-serif;
                     overflow-y: auto;
+                    -webkit-overflow-scrolling: touch;
+                    overscroll-behavior: contain;
+                    touch-action: pan-y;
                 `;
 
                 const memoryModalContent = document.createElement('div');
@@ -321,6 +330,9 @@ function showProjectModal(content, switchToFollowMode) {
                     width: 95%;
                     max-height: 90vh;
                     overflow-y: auto;
+                    -webkit-overflow-scrolling: touch;
+                    overscroll-behavior: contain;
+                    touch-action: pan-y;
                     border: 1px solid rgba(255,255,255,0.14);
                     box-shadow: 0 30px 80px rgba(0,0,0,0.65);
                     position: relative;
@@ -617,6 +629,9 @@ function showControlsModal() {
         align-items: center;
         z-index: 1000;
         font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
     `;
 
     // Create modal content
@@ -629,6 +644,9 @@ function showControlsModal() {
         width: 90%;
         max-height: 80vh;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
         border: 1px solid rgba(255,255,255,0.14);
         box-shadow: 0 30px 80px rgba(0,0,0,0.65);
         position: relative;
@@ -760,6 +778,9 @@ function showWelcomeModal() {
         align-items: center;
         z-index: 1000;
         font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
     `;
 
     // Create modal content
@@ -772,6 +793,9 @@ function showWelcomeModal() {
         width: 90%;
         max-height: 80vh;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        touch-action: pan-y;
         border: 1px solid rgba(255,255,255,0.14);
         box-shadow: 0 30px 80px rgba(0,0,0,0.65);
         position: relative;
