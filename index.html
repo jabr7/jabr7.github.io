@@ -4,10 +4,141 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 			<title>Ocean Portfolio - Joaquin Bonifacino</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 	<style>
-		body { margin: 0; overflow: hidden; background: #000; }
+		:root{
+			--ui-bg: #050506;
+			--ui-panel: rgba(12, 12, 14, 0.70);
+			--ui-panel-strong: rgba(12, 12, 14, 0.86);
+			--ui-text: rgba(255,255,255,0.92);
+			--ui-muted: rgba(255,255,255,0.62);
+			--ui-border: rgba(255,255,255,0.14);
+			--ui-border-strong: rgba(255,255,255,0.22);
+			--ui-radius: 14px;
+			--ui-radius-sm: 10px;
+			--ui-shadow: 0 30px 80px rgba(0,0,0,0.65);
+		}
+
+		body {
+			margin: 0;
+			overflow: hidden;
+			background: var(--ui-bg);
+			color: var(--ui-text);
+			font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+			letter-spacing: 0.01em;
+		}
+
+		body::before{
+			content:"";
+			position: fixed;
+			inset: 0;
+			pointer-events: none;
+			background:
+				repeating-linear-gradient(
+					0deg,
+					rgba(255,255,255,0.018) 0px,
+					rgba(255,255,255,0.018) 1px,
+					transparent 1px,
+					transparent 3px
+				),
+				radial-gradient(1200px 800px at 10% 10%, rgba(255,255,255,0.06), transparent 55%),
+				radial-gradient(900px 600px at 90% 15%, rgba(255,255,255,0.035), transparent 52%);
+			opacity: 0.65;
+			mix-blend-mode: overlay;
+		}
+
 		canvas { display: block; }
-		#hud { position: absolute; top: 10px; left: 10px; color: #fff; font-family: monospace; font-size: 13px; }
+
+		#hud { position: absolute; top: 10px; left: 10px; color: var(--ui-text); font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 13px; z-index: 100; }
+
+		.hud-button {
+			appearance: none;
+			border: 1px solid var(--ui-border);
+			background: var(--ui-panel);
+			color: var(--ui-text);
+			border-radius: 999px;
+			padding: 7px 12px;
+			cursor: pointer;
+			font-size: 12px;
+			line-height: 1;
+			transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
+		}
+		.hud-button:hover { background: var(--ui-panel-strong); border-color: var(--ui-border-strong); transform: translateY(-1px); }
+		.hud-button:active { transform: translateY(0); }
+
+		#profile-card { 
+			position: absolute; 
+			top: 60px; 
+			left: 10px; 
+			text-align: left;
+			background: var(--ui-panel); 
+			padding: 14px 14px 12px; 
+			border-radius: var(--ui-radius); 
+			border: 1px solid var(--ui-border);
+			z-index: 100;
+			pointer-events: auto;
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
+		}
+		#profile-card a { color: var(--ui-text); text-decoration: none; font-weight: 500; font-size: 12px; opacity: 0.82; }
+		#profile-card a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 3px; }
+
+		.profile-name{
+			font-family: "Fraunces", ui-serif, Georgia, serif;
+			font-weight: 650;
+			font-size: 18px;
+			letter-spacing: 0.01em;
+			color: var(--ui-text);
+			margin-bottom: 2px;
+		}
+		.profile-role{
+			font-size: 11px;
+			color: var(--ui-muted);
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			margin-bottom: 10px;
+		}
+
+		#contact-cta {
+			position: fixed;
+			bottom: 20px;
+			right: 20px;
+			background: var(--ui-panel);
+			color: var(--ui-text);
+			border: 1px solid var(--ui-border);
+			padding: 10px 14px;
+			border-radius: 999px;
+			cursor: pointer;
+			font-size: 12px;
+			font-weight: 500;
+			z-index: 100;
+			box-shadow: var(--ui-shadow);
+			transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, opacity 160ms ease;
+			text-decoration: none;
+			display: inline-block;
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
+		}
+		#contact-cta:hover {
+			transform: translateY(-1px);
+			background: var(--ui-panel-strong);
+			border-color: var(--ui-border-strong);
+		}
+		#contact-cta:active {
+			transform: translateY(0);
+		}
+		@media (max-width: 768px) {
+			#contact-cta {
+				bottom: 10px;
+				right: 10px;
+				padding: 10px 20px;
+				font-size: 13px;
+			}
+		}
 
 		/* Mobile controls styling */
 		#mobile-controls {
@@ -99,40 +230,24 @@
 </head>
 <body>
 			<div id="hud" style="position: relative;">
-			<span id="info-btn" style="
-				position: absolute;
-				top: 10px;
-				left: 10px;
-				background: rgba(0,0,0,0.7);
-				color: #fff;
-				border: 1px solid #444;
-				border-radius: 4px;
-				padding: 5px 10px;
-				cursor: pointer;
-				font-size: 14px;
-				transition: all 0.2s;
-				display: inline-block;
-				z-index: 100;
-			" onmouseover="this.style.background='rgba(0,0,0,0.9)'; this.style.borderColor='#666';"
-			onmouseout="this.style.background='rgba(0,0,0,0.7)'; this.style.borderColor='#444';">ℹ️ Controls</span>
+			<button id="info-btn" class="hud-button" style="position: absolute; top: 10px; left: 10px; z-index: 100;">Controls</button>
 		</div>
 
+		<div id="profile-card">
+			<div class="profile-name">Joaquin Bonifacino</div>
+			<div class="profile-role">Applied AI Engineer</div>
+			<div style="display: flex; flex-wrap: wrap; gap: 12px;">
+				<a href="https://linkedin.com/in/joaquin-bonifacino" target="_blank">LinkedIn</a>
+				<a href="https://github.com/jabrPromtior" target="_blank">GitHub (Work)</a>
+				<a href="https://github.com/jabr7" target="_blank">GitHub (Personal)</a>
+			</div>
+		</div>
+
+		<!-- Contact CTA Button -->
+		<a id="contact-cta" href="https://linkedin.com/in/joaquin-bonifacino" target="_blank">Contact</a>
+
 		<!-- Simple LoFi Music Toggle -->
-		<button id="music-toggle" style="
-			position: absolute;
-			top: 20px;
-			left: 150px;
-			background: rgba(0,0,0,0.7);
-			color: #fff;
-			border: 1px solid #666;
-			border-radius: 4px;
-			padding: 5px 10px;
-			cursor: pointer;
-			font-size: 12px;
-			transition: all 0.2s;
-			z-index: 100;
-		" onmouseover="this.style.background='rgba(0,0,0,0.9)'; this.style.borderColor='#999';"
-		onmouseout="this.style.background='rgba(0,0,0,0.7)'; this.style.borderColor='#666';">🎵 LoFi</button>
+		<button id="music-toggle" class="hud-button" style="position: absolute; top: 20px; left: 150px; z-index: 100;">Music</button>
 
 		<!-- LoFi Background Music -->
 		<audio id="lofi-music" loop preload="none">
@@ -166,14 +281,12 @@
 			musicToggle.addEventListener('click', function() {
 				if (isPlaying) {
 					lofiMusic.pause();
-					musicToggle.textContent = '🎵 LoFi';
-					musicToggle.style.background = 'rgba(0,0,0,0.7)';
-					console.log('🎵 LoFi music paused');
+					musicToggle.textContent = 'Music';
+					console.log('LoFi music paused');
 				} else {
 					lofiMusic.play().then(() => {
-						musicToggle.textContent = '🎵 Playing';
-						musicToggle.style.background = 'rgba(74, 144, 226, 0.7)';
-						console.log('🎵 LoFi music started');
+						musicToggle.textContent = 'Playing';
+						console.log('LoFi music started');
 					}).catch(error => {
 						console.error('Error playing LoFi music:', error);
 						alert('Unable to play music. Please check your browser settings or add audio files.');
@@ -185,11 +298,10 @@
 			// Update button state when music ends
 			lofiMusic.addEventListener('ended', function() {
 				isPlaying = false;
-				musicToggle.textContent = '🎵 LoFi';
-				musicToggle.style.background = 'rgba(0,0,0,0.7)';
+				musicToggle.textContent = 'Music';
 			});
 
-			console.log('🎵 Simple LoFi music ready! Click the button to start.');
+			console.log('LoFi music ready. Click Music to start.');
 		});
 	</script>
 

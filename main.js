@@ -352,7 +352,7 @@ scene.add(dots);
 import { initBoat, updateBoat, boatPosition, boatRotation, boatGeometry, keys } from './boat.js';
 import { initWaveSampling } from './wave-sampling.js';
 import { initBuoys, updateBuoys, interactWithBuoy, getCurrentHighlightedBuoy, updateTextSprites } from './buoy.js';
-import { showControlsModal } from './modal.js';
+import { showControlsModal, showWelcomeModal } from './modal.js';
 import { initTrails, updateTrails } from './trails.js';
 
 
@@ -757,14 +757,14 @@ function animate() {
 
 // First-time visitor detection and info button setup
 document.addEventListener('DOMContentLoaded', () => {
-    const hasVisited = localStorage.getItem('oceanPortfolioVisited');
+    const hasVisited = localStorage.getItem('oceanPortfolioWelcomeShown');
 
-    // Show controls modal on first visit
+    // Show welcome modal on first visit
     if (!hasVisited) {
         // Small delay to let the page load
         setTimeout(() => {
-            showControlsModal();
-            localStorage.setItem('oceanPortfolioVisited', 'true');
+            showWelcomeModal();
+            localStorage.setItem('oceanPortfolioWelcomeShown', 'true');
         }, 1000);
     }
 
