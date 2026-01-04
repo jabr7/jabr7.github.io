@@ -850,10 +850,41 @@ function enforceLandscape() {
 // Mobile detection and touch controls
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
 
+function setupMobileExternalLinks() {
+	if (!isMobile) return;
+
+	const profileCard = document.getElementById('profile-card');
+	if (!profileCard) return;
+
+	const anchors = Array.from(profileCard.querySelectorAll('a[href]'));
+	for (const a of anchors) {
+		const href = a.getAttribute('href') || '';
+		const isExternalProfile =
+			href.startsWith('https://github.com/') ||
+			href.startsWith('https://www.github.com/') ||
+			href.startsWith('https://linkedin.com/') ||
+			href.startsWith('https://www.linkedin.com/');
+
+		if (!isExternalProfile) continue;
+
+		a.removeAttribute('target');
+
+		a.addEventListener(
+			'click',
+			(e) => {
+				e.preventDefault();
+				window.location.assign(href);
+			},
+			{ passive: false }
+		);
+	}
+}
+
 if (isMobile) {
     createMobileControls();
     updateMobileHUD();
     enforceLandscape();
+	setupMobileExternalLinks();
 }
 
 // Initialize buoys

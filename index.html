@@ -417,7 +417,7 @@
 				<a href="https://github.com/jabr7" target="_blank">GitHub (Personal)</a>
 			</div>
 			<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 8px;">
-				<a href="#" class="email-copy" id="email-copy" data-email="joaquinbonifacino7@gmail.com">Email</a>
+				<a href="mailto:joaquinbonifacino7@gmail.com" class="email-copy" id="email-copy" data-email="joaquinbonifacino7@gmail.com">Email</a>
 				<a href="./Joaquin Bonifacino's Resume.pdf" download="Joaquin_Bonifacino_Resume.pdf">Resume</a>
 			</div>
 		</div>
@@ -485,6 +485,8 @@
 			const emailCopy = document.getElementById('email-copy');
 			if (emailCopy) {
 				emailCopy.addEventListener('click', async function(e) {
+					const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+					if (isMobile) return;
 					e.preventDefault();
 					const email = this.getAttribute('data-email');
 					try {
