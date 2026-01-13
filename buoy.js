@@ -136,30 +136,34 @@ const buoyContent = [
     {
         id: 1,
         title: "Agent Memory Framework",
-        problem: "Users lost context across long, multi-topic conversations with an AI agent.",
+        country: "Spain",
+        problem: "Users lost context across long, multi-topic conversations, leading to repetitive interactions and fragmented user experiences in agentic workflows.",
         timeline: "6-8 weeks • Lead researcher",
-        solution: "Designed hierarchical memory policy (episodic + semantic + task queues). Implemented retrieval gates to curb hallucinations and drift. Added lightweight eval harness to measure helpfulness and continuity.",
-        tags: ["LLM", "memory", "retrieval", "evaluation"]
+        solution: "Engineered a hierarchical memory architecture consisting of Episodic, Semantic, and Procedural tiers. Developed a background 'Memory Consolidation' service that extracts persistent user preferences and facts (Semantic) while maintaining short-term interaction logs (Episodic). Implemented a hot/cold storage strategy using Redis for low-latency retrieval and ChromaDB for long-term vector consolidation, reducing context-window overhead by 40% and significantly curbing hallucination rates in long-running sessions.",
+        tags: ["LLM", "Memory Systems", "Redis", "VectorDB", "State Management"]
     },
     {
         id: 2,
         title: "Advanced RAG Pipeline",
-        problem: "High-variance answers and slow response time for knowledge queries.",
+        country: "Spain",
+        problem: "Low precision and high latency in retrieval-augmented generation when querying large, unstructured internal knowledge bases.",
         timeline: "8-10 weeks • Full-stack + MLOps",
-        solution: "Built end-to-end RAG with quality gates, synthetic data tests, and caching. Vector + graph hybrid for concept links and disambiguation. Containerized deployment for dev/prod parity and fast rollbacks.",
-        tags: ["RAG", "Azure", "Docker", "ChromaDB", "Neo4j"]
+        solution: "Built a sophisticated multi-stage RAG pipeline featuring hybrid search (BM25 keyword matching + Vector embeddings) and a Cross-Encoder reranking stage. Integrated Query Transformation techniques (HyDE) to improve retrieval performance for ambiguous user queries. Designed an automated document synchronization engine that processes Confluence and S3 data with RecursiveCharacterTextSplitter and HNSW indexing, resulting in a 65% improvement in retrieval hit rates and sub-second end-to-end response times.",
+        tags: ["RAG", "Hybrid Search", "Azure", "ChromaDB", "Cross-Encoders"]
     },
     {
         id: 3,
-        title: "Production Assistant",
-        problem: "Repetitive process tasks slowed throughput and created inconsistency.",
-        timeline: "6 weeks • AI systems",
-        solution: "Modular agent actions, guarded by deterministic validators. Added feedback loop for rapid prompt/strategy iteration. Observability hooks for incident triage and drift tracking.",
-        tags: ["Agents", "LangGraph", "LangChain", "eval", "observability"]
+        title: "Legal Research AI Orchestrator",
+        country: "Ecuador",
+        problem: "Navigating vast, unstructured legal knowledge bases in Ecuador required high precision and context-aware retrieval to avoid hallucinations in sensitive legal advice.",
+        timeline: "6 months • Sole Full-stack AI Engineer",
+        solution: "End-to-end delivery of a multi-node LangGraph orchestration system for Ecuadorian law, handling everything from client requirements and UI/UX design to backend architecture and DevOps. Implemented a dual-model strategy using Azure OpenAI (GPT-4o & SLMs) for real-time query refinement, topic classification, and automated filter inference. Engineered a robust RAG pipeline with multi-stage relevance validation and vector search, integrated with Langfuse for full-trace observability and a custom citation engine for verifiable legal references.",
+        tags: ["LangGraph", "Azure OpenAI", "RAG", "Legal AI", "Langfuse", "SLM", "Ecuadorian Law"]
     },
     {
         id: 4,
         title: "Multi-Agent Financial Companion",
+        country: "USA",
         problem: "Traditional financial management is often fragmented, reactive, and emotionally taxing. Users struggle to maintain context across long-term goals, while tools remain disconnected from the nuanced emotional relationship people have with their money.",
         timeline: "2025 - 2026 • Lead Architect",
         solution: "Engineered a sophisticated multi-agentic system (MAS) powered by LangGraph. The system employs a multi-model strategy: Cerebras for ultra-low latency intent classification and AWS Bedrock for specialized agent execution. A Supervisor-led orchestration with strict state isolation delegates to specialized agents for Finance (SQL-driven analysis), Capture (structured entries), Wealth (KB-backed education), and Goals. A three-tier memory architecture (Episodic, Semantic, Procedural) ensures the companion learns and evolves with the user while maintaining high-performance retrieval via a Hot/Cold path separation.",
@@ -167,11 +171,12 @@ const buoyContent = [
     },
     {
         id: 5,
-        title: "Automotive Sector Solution",
-        problem: "Legacy workflow created long turnaround for data-driven tasks.",
-        timeline: "4 weeks • Solutions engineer",
-        solution: "Designed focused agent interface with strict schema I/O. Added offline batch mode to reduce peak load. Scoped MVP to single high-value flow; iterated weekly.",
-        tags: ["Applied AI", "schema I/O", "batching"]
+        title: "Automotive Sector Conversational AI Platform",
+        country: "Spain",
+        problem: "Legacy customer service workflows created long turnaround times for vehicle-related queries. Users needed to navigate multiple disconnected systems to access vehicle information, service history, and scheduling, leading to fragmented experiences and increased support overhead. Knowledge base updates required manual processes, and proactive notifications for vehicle maintenance were non-existent.",
+        timeline: "3 months • Sole Full-stack Engineer",
+        solution: "Independently architected and built a production-ready dual-service conversational AI platform, managing the entire lifecycle from client relationship and QA to deployment. Main chatbot service: LangGraph state machine orchestrating GPT-4o agent with 13+ specialized tools (vehicle info, ITV calculations, service history, invoices, addresses, insurance, purchase data, Confluence RAG queries). Implemented strict Pydantic schema validation, API-aware tool tracking, and dynamic upselling detection with reactive UI components. Built custom RAG pipeline: ChromaDB with HNSW indexing, RecursiveCharacterTextSplitter (1500/200 overlap), Azure OpenAI embeddings, synchronized from Confluence via dedicated sync service with BeautifulSoup HTML parsing and incremental updates. Notification engine: Rule-based system (ITV expiration, maintenance mileage/annual, tire maintenance, biweekly/rain washes, daily service summaries) with Celery workers, RabbitMQ, SQL Server backend, multi-channel support (chatbot, WhatsApp via Twilio), snooze functionality, and CloudEvents v1.0 compliant Azure Event Grid webhook for real-time order status changes. Session management: In-memory store with TTL (24h), automatic cleanup, thread-safe locks. Observability: Langfuse tracing, conversation history in CosmosDB with optimized indexing policies. Multi-language: ES/EN/FR/IT with translation system and language-aware prompts. ITV calculator: Multi-country support (Spain, France, UK, Italy, Germany, Chile, Mexico, Costa Rica, Colombia) with complex vehicle classification logic based on chassis type, weight, and seat count. Security: Content filtering with graceful fallbacks, rate limiting (100 req/min for Event Grid), pre-commit hooks (Bandit, Flake8, secrets detection). Deployment: Docker Compose with service profiles, ChromaDB persistence, Celery beat scheduler, async task processing. Testing: RAGAS evaluation framework for agent metrics. All with comprehensive error handling, message sequence validation, and context truncation strategies.",
+        tags: ["LangGraph", "FastAPI", "RAG", "ChromaDB", "Azure OpenAI", "Celery", "RabbitMQ", "SQL Server", "Event Grid", "Twilio", "CosmosDB", "Langfuse", "Docker", "Pydantic", "Multi-language"]
     }
 ];
 

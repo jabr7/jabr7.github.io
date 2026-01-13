@@ -166,20 +166,20 @@ function showProjectModal(content, switchToFollowMode) {
                 </div>
             </div>
 
-            <!-- Timeline and Technologies -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px;">
+            <!-- Timeline, Country, and Technologies -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 18px;">
                 <div style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
                     <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">Timeline</div>
                     <p style="margin: 0; color: rgba(255,255,255,0.86); font-weight: 600;">${content.timeline}</p>
                 </div>
                 <div style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                    <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">Country</div>
+                    <p style="margin: 0; color: rgba(255,255,255,0.86); font-weight: 600;">${content.country || 'International'}</p>
+                </div>
+                <div style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
                     <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">Technologies</div>
                     <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                        <span style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.74); padding: 5px 10px; border-radius: 999px; font-size: 0.78em; border: 1px solid rgba(255,255,255,0.12);">LangGraph</span>
-                        <span style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.74); padding: 5px 10px; border-radius: 999px; font-size: 0.78em; border: 1px solid rgba(255,255,255,0.12);">AWS Bedrock</span>
-                        <span style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.74); padding: 5px 10px; border-radius: 999px; font-size: 0.78em; border: 1px solid rgba(255,255,255,0.12);">Cerebras</span>
-                        <span style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.74); padding: 5px 10px; border-radius: 999px; font-size: 0.78em; border: 1px solid rgba(255,255,255,0.12);">FastAPI</span>
-                        <span style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.74); padding: 5px 10px; border-radius: 999px; font-size: 0.78em; border: 1px solid rgba(255,255,255,0.12);">S3 Vector Store</span>
+                        ${content.tags.slice(0, 5).map(tag => `<span style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.74); padding: 5px 10px; border-radius: 999px; font-size: 0.78em; border: 1px solid rgba(255,255,255,0.12);">${tag}</span>`).join('')}
                     </div>
                 </div>
             </div>
@@ -551,10 +551,14 @@ function showProjectModal(content, switchToFollowMode) {
                     <p style="margin: 0; color: rgba(255,255,255,0.78); line-height: 1.65;">${content.solution}</p>
                 </section>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
                     <section style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
                         <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">Timeline</div>
                         <p style="margin: 0; color: rgba(255,255,255,0.86); font-weight: 600;">${content.timeline}</p>
+                    </section>
+                    <section style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                        <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">Country</div>
+                        <p style="margin: 0; color: rgba(255,255,255,0.86); font-weight: 600;">${content.country || 'International'}</p>
                     </section>
                     <section style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
                         <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">Technologies</div>
