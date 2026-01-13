@@ -220,58 +220,71 @@ export function initBuoys(scene, THREE) {
             icon.position.set(0, 8, 0); // Position above buoy
 
             // Add project title text above the icon
+            const title = buoyContent[index].title;
+            const fontSize = 120;
+            const padding = 60;
+            const borderWidth = 4;
+            const outlineWidth = 8;
+            const cornerRadius = 35;
+
+            const measureCanvas = document.createElement('canvas');
+            const measureContext = measureCanvas.getContext('2d');
+            measureContext.font = `Bold ${fontSize}px Arial`;
+
+            const metrics = measureContext.measureText(title);
+            const measuredTextWidth = metrics.width;
+            const measuredTextHeight =
+                Number.isFinite(metrics.actualBoundingBoxAscent) && Number.isFinite(metrics.actualBoundingBoxDescent)
+                    ? metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
+                    : fontSize * 1.2;
+
+            const bgWidth = Math.ceil(measuredTextWidth + (padding * 2) + (outlineWidth * 2));
+            const bgHeight = Math.ceil(measuredTextHeight + (padding * 2) + (outlineWidth * 2));
+
+            const maxCanvasWidth = 4096;
+            const maxCanvasHeight = 2048;
+            const devicePixelRatio = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1;
+            let dpr = Math.min(devicePixelRatio, 2);
+            dpr = Math.min(dpr, maxCanvasWidth / bgWidth, maxCanvasHeight / bgHeight);
+            dpr = Math.max(dpr, 0.5);
+
             const canvas = document.createElement('canvas');
             const context = canvas.getContext('2d');
-            canvas.width = 1836;  // Even larger canvas for bigger text
-            canvas.height = 384;  // Even larger height for bigger text
+            canvas.width = Math.ceil(bgWidth * dpr);
+            canvas.height = Math.ceil(bgHeight * dpr);
 
-            // Clear canvas with transparent background
-            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.scale(dpr, dpr);
+            context.clearRect(0, 0, bgWidth, bgHeight);
 
-            // Set up text properties
-            const fontSize = 120;  // Increased from 80px to 120px
             context.font = `Bold ${fontSize}px Arial`;
             context.textAlign = 'center';
             context.textBaseline = 'middle';
 
-            // Measure text to create background
-            const textWidth = context.measureText(buoyContent[index].title).width;
-            const textHeight = fontSize * 1.2; // Approximate line height
-            const padding = 60;  // Increased padding
-            const bgWidth = textWidth + (padding * 2);
-            const bgHeight = textHeight + (padding * 2);
-            const bgX = (canvas.width - bgWidth) / 2;
-            const bgY = (canvas.height - bgHeight) / 2;
-            const cornerRadius = 35;  // Larger corner radius
-
             // Draw rounded background rectangle
-            context.fillStyle = 'rgba(0, 0, 0, 0.8)'; // Semi-transparent black background
-            context.strokeStyle = '#ffffff'; // White border
-            context.lineWidth = 4;
+            context.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            context.strokeStyle = '#ffffff';
+            context.lineWidth = borderWidth;
 
-            // Draw rounded rectangle background (with fallback for older browsers)
             context.beginPath();
             if (context.roundRect) {
-                // Modern browsers with roundRect support
-                context.roundRect(bgX, bgY, bgWidth, bgHeight, cornerRadius);
+                context.roundRect(0, 0, bgWidth, bgHeight, cornerRadius);
             } else {
-                // Fallback for older browsers - draw rounded rectangle manually
-                context.moveTo(bgX + cornerRadius, bgY);
-                context.arcTo(bgX + bgWidth, bgY, bgX + bgWidth, bgY + cornerRadius, cornerRadius);
-                context.arcTo(bgX + bgWidth, bgY + bgHeight, bgX + bgWidth - cornerRadius, bgY + bgHeight, cornerRadius);
-                context.arcTo(bgX, bgY + bgHeight, bgX, bgY + bgHeight - cornerRadius, cornerRadius);
-                context.arcTo(bgX, bgY, bgX + cornerRadius, bgY, cornerRadius);
+                context.moveTo(cornerRadius, 0);
+                context.arcTo(bgWidth, 0, bgWidth, cornerRadius, cornerRadius);
+                context.arcTo(bgWidth, bgHeight, bgWidth - cornerRadius, bgHeight, cornerRadius);
+                context.arcTo(0, bgHeight, 0, bgHeight - cornerRadius, cornerRadius);
+                context.arcTo(0, 0, cornerRadius, 0, cornerRadius);
                 context.closePath();
             }
             context.fill();
             context.stroke();
 
             // Draw the text
-            context.fillStyle = '#ffffff'; // White text
-            context.strokeStyle = '#000000'; // Black text outline
-            context.lineWidth = 8;  // Thicker outline for larger text
-            context.strokeText(buoyContent[index].title, canvas.width / 2, canvas.height / 2);
-            context.fillText(buoyContent[index].title, canvas.width / 2, canvas.height / 2);
+            context.fillStyle = '#ffffff';
+            context.strokeStyle = '#000000';
+            context.lineWidth = outlineWidth;
+            context.strokeText(title, bgWidth / 2, bgHeight / 2);
+            context.fillText(title, bgWidth / 2, bgHeight / 2);
 
             const textTexture = new THREE.CanvasTexture(canvas);
             textTexture.generateMipmaps = false; // Prevent texture blurring
@@ -284,7 +297,9 @@ export function initBuoys(scene, THREE) {
                 opacity: 1.0  // Fully opaque for better visibility
             });
             const textSprite = new THREE.Sprite(textMaterial);
-            textSprite.scale.set(18, 4.5, 1);  // Even larger scale for 120px text
+            const pixelsPerWorldUnitX = 1836 / 18;
+            const pixelsPerWorldUnitY = 384 / 4.5;
+            textSprite.scale.set(bgWidth / pixelsPerWorldUnitX, bgHeight / pixelsPerWorldUnitY, 1);
             textSprite.position.set(0, 15, 0); // Position even higher above icon
 
             buoyGroup.add(textSprite);
