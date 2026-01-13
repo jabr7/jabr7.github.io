@@ -144,12 +144,12 @@ const buoyContent = [
     },
     {
         id: 2,
-        title: "Advanced RAG Pipeline",
-        country: "Spain",
-        problem: "Low precision and high latency in retrieval-augmented generation when querying large, unstructured internal knowledge bases.",
-        timeline: "8-10 weeks • Full-stack + MLOps",
-        solution: "Built a sophisticated multi-stage RAG pipeline featuring hybrid search (BM25 keyword matching + Vector embeddings) and a Cross-Encoder reranking stage. Integrated Query Transformation techniques (HyDE) to improve retrieval performance for ambiguous user queries. Designed an automated document synchronization engine that processes Confluence and S3 data with RecursiveCharacterTextSplitter and HNSW indexing, resulting in a 65% improvement in retrieval hit rates and sub-second end-to-end response times.",
-        tags: ["RAG", "Hybrid Search", "Azure", "ChromaDB", "Cross-Encoders"]
+        title: "AI-Powered Operations Manual Synthesizer",
+        country: "Uruguay",
+        problem: "A major international financial institution required up to 6 months and over $15,000 in expert labor to manually synthesize a single Operations Manual (MOP). The process involved cross-referencing thousands of pages of technical specifications, legal frameworks, and complex financial matrices, creating a massive bottleneck for project deployment.",
+        timeline: "2 months • Lead Full-stack AI Engineer",
+        solution: "Architected a production-ready RAG pipeline that automates the end-to-end synthesis of technical documentation. Integrated Azure Document Intelligence for high-fidelity extraction of unstructured data and tables, coupled with Azure AI Search for semantic context retrieval. Engineered a sophisticated orchestration layer using GPT-4o to generate compliant document sections—including hierarchical objectives, result matrices, and multi-year financial disbursement schedules—with strict JSON-schema validation and automated DOCX assembly. The system reduced document generation time from 6 months to just 4 minutes, with operational costs dropping from thousands of dollars to cents per execution.",
+        tags: ["GPT-4o", "Azure AI Search", "Document Intelligence", "RAG", "FastAPI", "Automated Synthesis", "DOCX Automation"]
     },
     {
         id: 3,
