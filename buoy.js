@@ -135,19 +135,19 @@ function removeInteractionRing(buoy) {
 const buoyContent = [
     {
         id: 1,
-        title: "Agent Memory Framework",
+        title: "Enterprise Automotive Operations Orchestrator",
         country: "Spain",
-        problem: "Users lost context across long, multi-topic conversations, leading to repetitive interactions and fragmented user experiences in agentic workflows.",
-        timeline: "6-8 weeks • Lead researcher",
-        solution: "Engineered a hierarchical memory architecture consisting of Episodic, Semantic, and Procedural tiers. Developed a background 'Memory Consolidation' service that extracts persistent user preferences and facts (Semantic) while maintaining short-term interaction logs (Episodic). Implemented a hot/cold storage strategy using Redis for low-latency retrieval and ChromaDB for long-term vector consolidation, reducing context-window overhead by 40% and significantly curbing hallucination rates in long-running sessions.",
-        tags: ["LLM", "Memory Systems", "Redis", "VectorDB", "State Management"]
+        problem: "A leading automotive service network faced significant operational friction due to decentralized management of service centers, fragmented inventory tracking, and complex workforce scheduling across multiple European regions.",
+        timeline: "2025 - 4 months • Full-stack Engineer (Team of 5)",
+        solution: "Co-engineered a comprehensive enterprise resource planning (ERP) system tailored for the automotive sector. Developed a high-concurrency .NET backend utilizing Clean Architecture and Domain-Driven Design (DDD) to synchronize multi-center inventory, automate order processing, and manage complex tire and service margins. Built a feature-rich Angular 16 frontend with NgRx for robust state management, implementing a sophisticated resource-timeline calendar system for real-time staff and maintenance scheduling. The platform integrated Azure AD for enterprise security, Chart.js for operational analytics, and automated reporting engines, centralizing the management of thousands of vehicle life cycles and service orders.",
+        tags: [".NET", "Angular", "NgRx", "SQL Server", "Resource Scheduling", "Clean Architecture", "Azure AD"]
     },
     {
         id: 2,
         title: "AI-Powered Operations Manual Synthesizer",
         country: "Uruguay",
         problem: "A major international financial institution required up to 6 months and over $15,000 in expert labor to manually synthesize a single Operations Manual (MOP). The process involved cross-referencing thousands of pages of technical specifications, legal frameworks, and complex financial matrices, creating a massive bottleneck for project deployment.",
-        timeline: "2 months • Lead Full-stack AI Engineer",
+        timeline: "2024 - 2 months • Lead Full-stack AI Engineer",
         solution: "Architected a production-ready RAG pipeline that automates the end-to-end synthesis of technical documentation. Integrated Azure Document Intelligence for high-fidelity extraction of unstructured data and tables, coupled with Azure AI Search for semantic context retrieval. Engineered a sophisticated orchestration layer using GPT-4o to generate compliant document sections—including hierarchical objectives, result matrices, and multi-year financial disbursement schedules—with strict JSON-schema validation and automated DOCX assembly. The system reduced document generation time from 6 months to just 4 minutes, with operational costs dropping from thousands of dollars to cents per execution.",
         tags: ["GPT-4o", "Azure AI Search", "Document Intelligence", "RAG", "FastAPI", "Automated Synthesis", "DOCX Automation"]
     },
@@ -156,7 +156,7 @@ const buoyContent = [
         title: "Legal Research AI Orchestrator",
         country: "Ecuador",
         problem: "Navigating vast, unstructured legal knowledge bases in Ecuador required high precision and context-aware retrieval to avoid hallucinations in sensitive legal advice.",
-        timeline: "6 months • Sole Full-stack AI Engineer",
+        timeline: "2024 - 6 months • Sole Full-stack AI Engineer",
         solution: "End-to-end delivery of a multi-node LangGraph orchestration system for Ecuadorian law, handling everything from client requirements and UI/UX design to backend architecture and DevOps. Implemented a dual-model strategy using Azure OpenAI (GPT-4o & SLMs) for real-time query refinement, topic classification, and automated filter inference. Engineered a robust RAG pipeline with multi-stage relevance validation and vector search, integrated with Langfuse for full-trace observability and a custom citation engine for verifiable legal references.",
         tags: ["LangGraph", "Azure OpenAI", "RAG", "Legal AI", "Langfuse", "SLM", "Ecuadorian Law"]
     },
@@ -165,7 +165,7 @@ const buoyContent = [
         title: "Multi-Agent Financial Companion",
         country: "USA",
         problem: "Traditional financial management is often fragmented, reactive, and emotionally taxing. Users struggle to maintain context across long-term goals, while tools remain disconnected from the nuanced emotional relationship people have with their money.",
-        timeline: "2025 - 2026 • Lead Architect",
+        timeline: "2025 - 2026 - 6 months• Lead Architect",
         solution: "Engineered a sophisticated multi-agentic system (MAS) powered by LangGraph. The system employs a multi-model strategy: Cerebras for ultra-low latency intent classification and AWS Bedrock for specialized agent execution. A Supervisor-led orchestration with strict state isolation delegates to specialized agents for Finance (SQL-driven analysis), Capture (structured entries), Wealth (KB-backed education), and Goals. A three-tier memory architecture (Episodic, Semantic, Procedural) ensures the companion learns and evolves with the user while maintaining high-performance retrieval via a Hot/Cold path separation.",
         tags: ["LangGraph", "Multi-Agent Systems", "AWS Bedrock", "Cerebras", "SQL Generation", "Vector RAG"]
     },
@@ -175,8 +175,8 @@ const buoyContent = [
         country: "Spain",
         problem: "Legacy customer service workflows created long turnaround times for vehicle-related queries. Users needed to navigate multiple disconnected systems to access vehicle information, service history, and scheduling, leading to fragmented experiences and increased support overhead. Knowledge base updates required manual processes, and proactive notifications for vehicle maintenance were non-existent.",
         timeline: "3 months • Sole Full-stack Engineer",
-        solution: "Independently architected and built a production-ready dual-service conversational AI platform, managing the entire lifecycle from client relationship and QA to deployment. Main chatbot service: LangGraph state machine orchestrating GPT-4o agent with 13+ specialized tools (vehicle info, ITV calculations, service history, invoices, addresses, insurance, purchase data, Confluence RAG queries). Implemented strict Pydantic schema validation, API-aware tool tracking, and dynamic upselling detection with reactive UI components. Built custom RAG pipeline: ChromaDB with HNSW indexing, RecursiveCharacterTextSplitter (1500/200 overlap), Azure OpenAI embeddings, synchronized from Confluence via dedicated sync service with BeautifulSoup HTML parsing and incremental updates. Notification engine: Rule-based system (ITV expiration, maintenance mileage/annual, tire maintenance, biweekly/rain washes, daily service summaries) with Celery workers, RabbitMQ, SQL Server backend, multi-channel support (chatbot, WhatsApp via Twilio), snooze functionality, and CloudEvents v1.0 compliant Azure Event Grid webhook for real-time order status changes. Session management: In-memory store with TTL (24h), automatic cleanup, thread-safe locks. Observability: Langfuse tracing, conversation history in CosmosDB with optimized indexing policies. Multi-language: ES/EN/FR/IT with translation system and language-aware prompts. ITV calculator: Multi-country support (Spain, France, UK, Italy, Germany, Chile, Mexico, Costa Rica, Colombia) with complex vehicle classification logic based on chassis type, weight, and seat count. Security: Content filtering with graceful fallbacks, rate limiting (100 req/min for Event Grid), pre-commit hooks (Bandit, Flake8, secrets detection). Deployment: Docker Compose with service profiles, ChromaDB persistence, Celery beat scheduler, async task processing. Testing: RAGAS evaluation framework for agent metrics. All with comprehensive error handling, message sequence validation, and context truncation strategies.",
-        tags: ["LangGraph", "FastAPI", "RAG", "ChromaDB", "Azure OpenAI", "Celery", "RabbitMQ", "SQL Server", "Event Grid", "Twilio", "CosmosDB", "Langfuse", "Docker", "Pydantic", "Multi-language"]
+        solution: "Built and shipped two coordinated production systems. (1) An agentic customer-facing assistant implemented as a LangGraph state machine, integrating directly with existing workshop APIs to let fleet customers query vehicles, service history, invoices, and upcoming scheduling without navigating large operational datasets. The agent streams responses/events for UI feedback, maintains session-level memory, supports multilingual interactions, and can retrieve internal knowledge from a Confluence-backed vector store. (2) A separate notification/sync service: a Celery + RabbitMQ rule engine that evaluates maintenance, ITV, washing and daily summary rules against large CosmosDB-backed historical data (plus external signals like weather), then dispatches notifications across channels (in-app/chat surfaces and WhatsApp via Twilio).",
+        tags: ["Agentic Systems", "LangGraph", "Azure OpenAI", "FastAPI", "CosmosDB", "Celery", "RabbitMQ", "Twilio", "Vector Search"]
     }
 ];
 
