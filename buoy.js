@@ -160,10 +160,10 @@ const buoyContent = [
     {
         id: 4,
         title: "Multi-Agent Financial Companion",
-        problem: "Talking about money is scary for people of all ages and genders. Traditional financial tools feel cold, judgmental, and disconnected from our real emotional relationship with money.",
-        timeline: "8-12 weeks • Lead architect",
-        solution: "Built a financial companion that gets into YOUR personality and stands on YOUR side. Three specialized agents work together: Finance Agent connects to your real data via Plaid, Wealth Agent provides personalized coaching, and Goal Agent helps you build budgets that actually work for your life. The system remembers your money feelings, adapts to your anxiety levels, and creates a safe space for financial growth.",
-        tags: ["Financial Coaching", "Personal AI", "Emotional Intelligence", "Budget Goals", "User-Centered"]
+        problem: "Traditional financial management is often fragmented, reactive, and emotionally taxing. Users struggle to maintain context across long-term goals, while tools remain disconnected from the nuanced emotional relationship people have with their money.",
+        timeline: "2025 - 2026 • Lead Architect",
+        solution: "Engineered a sophisticated multi-agentic system (MAS) powered by LangGraph. The system employs a multi-model strategy: Cerebras for ultra-low latency intent classification and AWS Bedrock for specialized agent execution. A Supervisor-led orchestration with strict state isolation delegates to specialized agents for Finance (SQL-driven analysis), Capture (structured entries), Wealth (KB-backed education), and Goals. A three-tier memory architecture (Episodic, Semantic, Procedural) ensures the companion learns and evolves with the user while maintaining high-performance retrieval via a Hot/Cold path separation.",
+        tags: ["LangGraph", "Multi-Agent Systems", "AWS Bedrock", "Cerebras", "SQL Generation", "Vector RAG"]
     },
     {
         id: 5,

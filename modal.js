@@ -4,7 +4,7 @@ export { showProjectModal, showControlsModal, showWelcomeModal };
 // Project details modal
 function showProjectModal(content, switchToFollowMode) {
     // Check if this is the special project for enhanced presentation
-    const isSpecialProject = content.title.includes('Multi-Agent Financial Companion');
+    const isSpecialProject = content.id === 4;
 
     // Create modal container
     const modal = document.createElement('div');
@@ -82,38 +82,58 @@ function showProjectModal(content, switchToFollowMode) {
                 <div style="text-align: center; color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px;">System Architecture</div>
 
                 <div id="mermaid-diagram" style="display: flex; justify-content: center; margin-bottom: 30px;">
-                    <div class="mermaid" style="width: 100%; max-width: 900px; background: rgba(0,0,0,0.18); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); min-height: 380px;">
+                    <div class="mermaid" style="width: 100%; max-width: 900px; background: rgba(0,0,0,0.18); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); min-height: 520px;">
                         graph TD
                             %% Nodes
-                            USER["You"]
-                            AGENT["Supervisor"]
-                            FINANCE["Finance"]
-                            WEALTH["Wealth"]
-                            GOALS["Goals"]
-                            MEMORY["Memory"]
+                            USER["User Input"]
+                            INTENT["Intent Classifier<br/>(Cerebras Fast Path)"]
+                            FAST["Fast Response Agent<br/>(Smalltalk)"]
+                            SUPERVISOR["Supervisor Agent<br/>(Orchestrator)"]
+                            
+                            FINANCE["Finance Agent<br/>(SQL Gen)"]
+                            CAPTURE["Capture Agent<br/>(Structured Data)"]
+                            WEALTH["Wealth Agent<br/>(KB + Nav)"]
+                            GOALS["Goal Agent<br/>(CRUD)"]
+                            
+                            MEMORY["Three-Tier Memory<br/>(Episodic, Semantic, Procedural)"]
+                            COLD["Cold Path Processing<br/>(Background Workers)"]
 
                             %% Minimal monochrome styling
                             classDef userStyle fill:#0d0d10,stroke:#bdbdbd,stroke-width:2px,color:#ffffff
                             classDef supervisorStyle fill:#0d0d10,stroke:#e6e6e6,stroke-width:2px,color:#ffffff
                             classDef agentStyle fill:#0d0d10,stroke:#8c8c8c,stroke-width:2px,color:#ffffff
                             classDef memoryStyle fill:#0d0d10,stroke:#8c8c8c,stroke-width:2px,color:#ffffff
+                            classDef fastStyle fill:#0d0d10,stroke:#666666,stroke-width:1px,color:#cccccc
+                            classDef workerStyle fill:#0d0d10,stroke:#444444,stroke-dasharray: 5 5,color:#aaaaaa
 
                             USER:::userStyle
-                            AGENT:::supervisorStyle
+                            INTENT:::supervisorStyle
+                            FAST:::fastStyle
+                            SUPERVISOR:::supervisorStyle
                             FINANCE:::agentStyle
+                            CAPTURE:::agentStyle
                             WEALTH:::agentStyle
                             GOALS:::agentStyle
                             MEMORY:::memoryStyle
+                            COLD:::workerStyle
 
                             %% Connections
-                            USER --> AGENT
-                            AGENT --> FINANCE
-                            AGENT --> WEALTH
-                            AGENT --> GOALS
-                            AGENT --> MEMORY
+                            USER --> INTENT
+                            INTENT -- "Smalltalk" --> FAST
+                            INTENT -- "Task" --> SUPERVISOR
+                            
+                            SUPERVISOR <--> MEMORY
+                            SUPERVISOR -- "Async Payload" --> COLD
+                            COLD --> MEMORY
+                            
+                            SUPERVISOR --> FINANCE
+                            SUPERVISOR --> CAPTURE
+                            SUPERVISOR --> WEALTH
+                            SUPERVISOR --> GOALS
 
-                            subgraph AGENTS["Specialized_Agents"]
+                            subgraph AGENTS["Specialized Agent Cluster (State Isolated)"]
                                 FINANCE
+                                CAPTURE
                                 WEALTH
                                 GOALS
                             end
@@ -122,22 +142,26 @@ function showProjectModal(content, switchToFollowMode) {
 
                 <!-- Diagram Legend -->
                 <div style="text-align: center; margin-top: 12px; font-size: 0.9em; color: rgba(255,255,255,0.62);">
-                    <strong>Click any node for details.</strong>
+                    <strong>A high-concurrency architecture using LangGraph for multi-agent delegation.</strong>
                 </div>
 
                 <!-- Agent Descriptions -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
-                    <div style="padding: 15px; background: rgba(255, 152, 0, 0.1); border-radius: 8px; border-left: 3px solid #FF9800;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 24px;">
+                    <div style="padding: 15px; background: rgba(255, 152, 0, 0.06); border-radius: 8px; border-left: 3px solid #FF9800;">
                         <h4 style="color: #FF9800; margin-bottom: 8px;">💰 Finance Agent</h4>
-                        <p style="margin: 0; color: #ccc; font-size: 0.9em;">Connects to your real financial data via Plaid. Analyzes spending patterns and provides insights without judgment.</p>
+                        <p style="margin: 0; color: #ccc; font-size: 0.9em;">Dynamic SQL generation over mirrored financial data. Uses procedural memory for complex query patterns while maintaining strict user isolation.</p>
                     </div>
-                    <div style="padding: 15px; background: rgba(156, 39, 176, 0.1); border-radius: 8px; border-left: 3px solid #9C27B0;">
-                        <h4 style="color: #9C27B0; margin-bottom: 8px;">🎯 Wealth Agent</h4>
-                        <p style="margin: 0; color: #ccc; font-size: 0.9em;">Your personal financial coach. Adapts communication style based on your personality and anxiety levels.</p>
+                    <div style="padding: 15px; background: rgba(33, 150, 243, 0.06); border-radius: 8px; border-left: 3px solid #2196F3;">
+                        <h4 style="color: #2196F3; margin-bottom: 8px;">📥 Capture Agent</h4>
+                        <p style="margin: 0; color: #ccc; font-size: 0.9em;">Converts natural language into structured financial entries (assets, liabilities, transactions) with multi-intent extraction and validation.</p>
                     </div>
-                    <div style="padding: 15px; background: rgba(255, 87, 34, 0.1); border-radius: 8px; border-left: 3px solid #FF5722;">
+                    <div style="padding: 15px; background: rgba(156, 39, 176, 0.06); border-radius: 8px; border-left: 3px solid #9C27B0;">
+                        <h4 style="color: #9C27B0; margin-bottom: 8px;">📖 Wealth Agent</h4>
+                        <p style="margin: 0; color: #ccc; font-size: 0.9em;">RAG-based education engine. Combines internal product knowledge with external financial wisdom, emitting navigation events for proactive UX guidance.</p>
+                    </div>
+                    <div style="padding: 15px; background: rgba(255, 87, 34, 0.06); border-radius: 8px; border-left: 3px solid #FF5722;">
                         <h4 style="color: #FF5722; margin-bottom: 8px;">📊 Goal Agent</h4>
-                        <p style="margin: 0; color: #ccc; font-size: 0.9em;">Helps you build budgets that actually work for your life. Remembers your preferences and adjusts goals accordingly.</p>
+                        <p style="margin: 0; color: #ccc; font-size: 0.9em;">Persistent state management for financial objectives. Handles complex status transitions and cross-session budget tracking.</p>
                     </div>
                 </div>
             </div>
@@ -151,30 +175,34 @@ function showProjectModal(content, switchToFollowMode) {
                 <div style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
                     <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">Technologies</div>
                     <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                        ${content.tags.map(tag => `<span style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.74); padding: 5px 10px; border-radius: 999px; font-size: 0.78em; border: 1px solid rgba(255,255,255,0.12);">${tag}</span>`).join('')}
+                        <span style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.74); padding: 5px 10px; border-radius: 999px; font-size: 0.78em; border: 1px solid rgba(255,255,255,0.12);">LangGraph</span>
+                        <span style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.74); padding: 5px 10px; border-radius: 999px; font-size: 0.78em; border: 1px solid rgba(255,255,255,0.12);">AWS Bedrock</span>
+                        <span style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.74); padding: 5px 10px; border-radius: 999px; font-size: 0.78em; border: 1px solid rgba(255,255,255,0.12);">Cerebras</span>
+                        <span style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.74); padding: 5px 10px; border-radius: 999px; font-size: 0.78em; border: 1px solid rgba(255,255,255,0.12);">FastAPI</span>
+                        <span style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.74); padding: 5px 10px; border-radius: 999px; font-size: 0.78em; border: 1px solid rgba(255,255,255,0.12);">S3 Vector Store</span>
                     </div>
                 </div>
             </div>
 
             <!-- Key Features -->
             <div style="margin-bottom: 18px; padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
-                <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px;">Key Features</div>
+                <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px;">Key Architectural Pillars</div>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px;">
                     <div>
-                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Memory System</strong>
-                        <small style="color: rgba(255,255,255,0.62);">Remembers your personality & preferences</small>
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Three-Tier Memory</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Episodic, Semantic, and Procedural retrieval for hyper-personalization.</small>
                     </div>
                     <div>
-                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Emotional Intelligence</strong>
-                        <small style="color: rgba(255,255,255,0.62);">Adapts to your anxiety levels</small>
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Multi-Model Strategy</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Cerebras for low-latency routing; AWS Bedrock for complex reasoning.</small>
                     </div>
                     <div>
-                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Safe Space</strong>
-                        <small style="color: rgba(255,255,255,0.62);">Non-judgmental financial guidance</small>
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">State Isolation</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Agents operate on scoped data to maximize context window and accuracy.</small>
                     </div>
                     <div>
-                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Personal Goals</strong>
-                        <small style="color: rgba(255,255,255,0.62);">Budgets that work for your life</small>
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Dynamic SQL Gen</strong>
+                        <small style="color: rgba(255,255,255,0.62);">In-context learning for accurate financial data analysis without hardcoding.</small>
                     </div>
                 </div>
             </div>
@@ -275,22 +303,30 @@ function showProjectModal(content, switchToFollowMode) {
             };
 
             const showNodeDetails = (nodeText) => {
-                if (nodeText.includes('MEMORY')) {
+                if (nodeText.includes('Memory')) {
                     // Show detailed memory flowchart modal
                     showMemoryFlowchartModal();
                 } else {
                     let details = '';
 
-                    if (nodeText.includes('You')) {
-                        details = 'You: The user at the center of the system.';
+                    if (nodeText.includes('Input')) {
+                        details = 'User Input: The starting point for all interactions, processed through safety guardrails.';
+                    } else if (nodeText.includes('Intent')) {
+                        details = 'Intent Classifier: A Cerebras-powered router that distinguishes between smalltalk (Fast Path) and complex tasks in <100ms.';
+                    } else if (nodeText.includes('Fast')) {
+                        details = 'Fast Response Agent: A low-latency model optimized for conversational smalltalk and quick acknowledgments.';
                     } else if (nodeText.includes('Supervisor')) {
-                        details = 'Supervisor: Routes requests to specialized agents and manages conversation state.';
+                        details = 'Supervisor Agent: The central orchestrator that manages state isolation and delegates complex tasks to specialized agents.';
                     } else if (nodeText.includes('Finance')) {
-                        details = 'Finance: Connects to financial data (e.g., Plaid) and extracts spending signals.';
+                        details = 'Finance Agent: Generates dynamic SQL to query mirrored financial data, providing deep insights into spending and net worth.';
+                    } else if (nodeText.includes('Capture')) {
+                        details = 'Capture Agent: Uses advanced extraction to turn natural language into structured financial records (assets, liabilities, transactions).';
                     } else if (nodeText.includes('Wealth')) {
-                        details = 'Wealth: Coaching layer that adapts tone and guidance to the user.';
-                    } else if (nodeText.includes('Goals')) {
-                        details = 'Goals: Budgeting, planning, and goal tracking.';
+                        details = 'Wealth Agent: A financial educator that uses RAG to retrieve information from a curated knowledge base and guides users through the app.';
+                    } else if (nodeText.includes('Goal')) {
+                        details = 'Goal Agent: Tracks and manages persistent financial objectives across conversation sessions.';
+                    } else if (nodeText.includes('Cold')) {
+                        details = 'Cold Path Processing: Asynchronous background workers that handle expensive memory merging, novelty detection, and profile synchronization without blocking the user response.';
                     }
 
                     if (details) {
@@ -353,14 +389,14 @@ function showProjectModal(content, switchToFollowMode) {
                     <div style="margin-bottom: 30px;">
                         <div class="memory-mermaid" style="width: 100%; background: rgba(255,255,255,0.04); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.10); min-height: 500px;">
                             graph TD
-                                A["User Asks<br/>What is my spending pattern?"] --> B["Memory System<br/>Searches and Retrieves"]
-                                B --> C["Injects Context<br/>• You prefer coffee shops over chains<br/>• Last month: $120 dining out<br/>• Goal: Save $500 this month"]
+                                A["User Asks<br/>What is my spending pattern?"] --> B["Memory System<br/>Context Injection"]
+                                B --> C["Retrieve Tiers<br/>• Semantic: You prefer coffee shops<br/>• Episodic: Last week's budget talk<br/>• Procedural: SQL query patterns"]
 
-                                C --> D["Supervisor Agent<br/>Makes Personalized Response"]
-                                D --> E["Based on your preferences<br/>I recommend these budget adjustments"]
+                                C --> D["Supervisor Agent<br/>State Isolation & Delegation"]
+                                D --> E["Agent Action<br/>Dynamic SQL Gen / KB Search"]
 
-                                E --> F["Episodic Memory<br/>Captures This Interaction"]
-                                F --> G["Next Time<br/>Remembers our conversation<br/>about your coffee spending"]
+                                E --> F["Episodic Capture<br/>Background Processing"]
+                                F --> G["Continuous Learning<br/>Profile Sync & Memory Merge"]
 
                                 classDef userClass fill:#0d0d10,stroke:rgba(255,255,255,0.22),stroke-width:2px,color:rgba(255,255,255,0.92)
                                 classDef memoryClass fill:#0d0d10,stroke:rgba(255,255,255,0.22),stroke-width:2px,color:rgba(255,255,255,0.92)
