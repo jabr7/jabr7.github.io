@@ -138,7 +138,7 @@ const buoyContent = [
         title: "Enterprise Automotive Operations Orchestrator",
         country: "Spain",
         problem: "A leading automotive service network faced significant operational friction due to decentralized management of service centers, fragmented inventory tracking, and complex workforce scheduling across multiple European regions.",
-        timeline: "2025 - 4 months • Full-stack Engineer (Team of 5)",
+        timeline: "2025 - 4 months • Full-stack Engineer (Team of 6)",
         solution: "Co-engineered a comprehensive enterprise resource planning (ERP) system tailored for the automotive sector. Developed a high-concurrency .NET backend utilizing Clean Architecture and Domain-Driven Design (DDD) to synchronize multi-center inventory, automate order processing, and manage complex tire and service margins. Built a feature-rich Angular 16 frontend with NgRx for robust state management, implementing a sophisticated resource-timeline calendar system for real-time staff and maintenance scheduling. The platform integrated Azure AD for enterprise security, Chart.js for operational analytics, and automated reporting engines, centralizing the management of thousands of vehicle life cycles and service orders.",
         tags: [".NET", "Angular", "NgRx", "SQL Server", "Resource Scheduling", "Clean Architecture", "Azure AD"]
     },
@@ -165,7 +165,7 @@ const buoyContent = [
         title: "Multi-Agent Financial Companion",
         country: "USA",
         problem: "Traditional financial management is often fragmented, reactive, and emotionally taxing. Users struggle to maintain context across long-term goals, while tools remain disconnected from the nuanced emotional relationship people have with their money.",
-        timeline: "2025 - 2026 - 6 months• Lead Architect",
+        timeline: "2025 - 2026 - 6 months• Lead Architect (Team of 10)",
         solution: "Engineered a sophisticated multi-agentic system (MAS) powered by LangGraph. The system employs a multi-model strategy: Cerebras for ultra-low latency intent classification and AWS Bedrock for specialized agent execution. A Supervisor-led orchestration with strict state isolation delegates to specialized agents for Finance (SQL-driven analysis), Capture (structured entries), Wealth (KB-backed education), and Goals. A three-tier memory architecture (Episodic, Semantic, Procedural) ensures the companion learns and evolves with the user while maintaining high-performance retrieval via a Hot/Cold path separation.",
         tags: ["LangGraph", "Multi-Agent Systems", "AWS Bedrock", "Cerebras", "SQL Generation", "Vector RAG"]
     },
