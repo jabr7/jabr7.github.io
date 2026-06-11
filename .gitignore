@@ -1,0 +1,3 @@
+# Local dev / editor config (not part of the site)
+.claude/
+.cursor/

@@ -43,6 +43,10 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+	<!-- Privacy-friendly analytics (GoatCounter) -->
+	<script data-goatcounter="https://jabr7.goatcounter.com/count"
+	        async src="//gc.zgo.at/count.js"></script>
 	<style>
 		:root{
 			--ui-bg: #050506;
@@ -206,10 +210,22 @@
 
 		/* Mobile SweetAlert2 fixes */
 		@media (max-width: 768px) {
-			#profile-card,
 			#music-toggle {
 				display: none !important;
 			}
+
+			/* Keep contact reachable on mobile: compact card, top-center */
+			#profile-card {
+				top: calc(8px + env(safe-area-inset-top, 0px)) !important;
+				left: 50% !important;
+				transform: translateX(-50%) !important;
+				padding: 7px 12px !important;
+				max-width: calc(100vw - 140px);
+			}
+			#profile-card .profile-name { font-size: 13px !important; margin-bottom: 0 !important; }
+			#profile-card .profile-role { display: none !important; }
+			#profile-card a, #profile-card .email-copy { font-size: 11px !important; }
+			#profile-card > div { gap: 10px !important; margin-top: 4px !important; }
 
 			.swal2-popup {
 				max-height: 90vh !important;
@@ -390,6 +406,23 @@
 			}
 		}
 
+		/* Hide scrollbars inside overlays/modals (scrolling still works) */
+		#menu-modal, #menu-modal *,
+		#project-modal, #project-modal *,
+		#controls-modal, #controls-modal *,
+		#welcome-modal, #welcome-modal *,
+		#memory-flowchart-modal, #memory-flowchart-modal * {
+			scrollbar-width: none;       /* Firefox */
+			-ms-overflow-style: none;    /* IE / old Edge */
+		}
+		#menu-modal::-webkit-scrollbar, #menu-modal *::-webkit-scrollbar,
+		#project-modal::-webkit-scrollbar, #project-modal *::-webkit-scrollbar,
+		#controls-modal::-webkit-scrollbar, #controls-modal *::-webkit-scrollbar,
+		#welcome-modal::-webkit-scrollbar, #welcome-modal *::-webkit-scrollbar,
+		#memory-flowchart-modal::-webkit-scrollbar, #memory-flowchart-modal *::-webkit-scrollbar {
+			display: none;               /* Chrome / Safari */
+		}
+
 	</style>
 </head>
 <body>
@@ -410,10 +443,17 @@
 
 		<div id="profile-card">
 			<div class="profile-name">Joaquin Bonifacino</div>
-			<div class="profile-role">Applied AI Engineer</div>
+			<div class="profile-role">AI / ML Engineer</div>
+			<button id="menu-btn" type="button" style="
+				appearance: none; cursor: pointer; width: 100%;
+				background: rgba(255,255,255,0.92); color: rgba(0,0,0,0.92);
+				border: 1px solid rgba(255,255,255,0.10); border-radius: 999px;
+				padding: 9px 14px; margin-bottom: 12px; font-size: 12px; font-weight: 600;
+				font-family: inherit; letter-spacing: 0.02em;
+			">View projects &amp; about</button>
 			<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
 				<a href="https://linkedin.com/in/joaquin-bonifacino" target="_blank">LinkedIn</a>
-				<a href="https://github.com/jabrPromtior" target="_blank">GitHub (Work)</a>
+				<a href="https://github.com/jabr7-zyte" target="_blank">GitHub (Work)</a>
 				<a href="https://github.com/jabr7" target="_blank">GitHub (Personal)</a>
 			</div>
 			<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 8px;">
@@ -458,17 +498,16 @@
 				if (isPlaying) {
 					lofiMusic.pause();
 					musicToggle.textContent = 'Music';
-					console.log('LoFi music paused');
+					isPlaying = false;
 				} else {
 					lofiMusic.play().then(() => {
 						musicToggle.textContent = 'Playing';
-						console.log('LoFi music started');
-					}).catch(error => {
-						console.error('Error playing LoFi music:', error);
-						alert('Unable to play music. Please check your browser settings or add audio files.');
+						isPlaying = true;
+					}).catch(() => {
+						musicToggle.textContent = 'Music';
+						isPlaying = false;
 					});
 				}
-				isPlaying = !isPlaying;
 			});
 
 			// Update button state when music ends
@@ -476,8 +515,6 @@
 				isPlaying = false;
 				musicToggle.textContent = 'Music';
 			});
-
-			console.log('LoFi music ready. Click Music to start.');
 		});
 
 		// Email copy-to-clipboard functionality
@@ -521,7 +558,7 @@
 		});
 	</script>
 
-	<script type="module" src="./main.js?v=3"></script>
+	<script type="module" src="./main.js?v=4"></script>
 	
 	<!-- Loader and Hint Text Logic -->
 	<script>
@@ -634,18 +671,6 @@
 			}
 		});
 		observer.observe(document.body, { childList: true, subtree: true });
-	</script>
-	
-	<!-- Force cache refresh -->
-	<script>
-		// Clear any cached versions
-		if ('serviceWorker' in navigator) {
-			navigator.serviceWorker.getRegistrations().then(function(registrations) {
-				for(let registration of registrations) {
-					registration.unregister();
-				}
-			});
-		}
 	</script>
 </body>
 </html>

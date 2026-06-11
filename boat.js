@@ -57,11 +57,7 @@ export function initBoat(scene, THREE) {
 
 		// Add to boat geometry group
 		boatGeometry.add(loadedBoat);
-
-		console.log('Boat model loaded successfully');
-	}, (progress) => {
-		console.log('Boat loading progress:', (progress.loaded / progress.total * 100) + '%');
-	}, (error) => {
+	}, undefined, (error) => {
 		console.error('Error loading boat model:', error);
 	});
 

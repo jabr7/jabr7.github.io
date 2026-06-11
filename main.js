@@ -344,23 +344,6 @@ function switchCameraMode(mode) {
     }
 }
 
-// Camera mode indicator
-const cameraModeIndicator = document.createElement('div');
-cameraModeIndicator.style.cssText = `
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    color: #fff;
-    font-family: monospace;
-    font-size: 12px;
-    background: rgba(0, 0, 0, 0.5);
-    padding: 5px 10px;
-    border-radius: 3px;
-    border: 1px solid #444;
-`;
-cameraModeIndicator.textContent = 'CAMERA: FOLLOW';
-document.body.appendChild(cameraModeIndicator);
-
 // Fullscreen toggle (Android Chrome support; requires user gesture)
 const fullscreenBtn = document.createElement('button');
 fullscreenBtn.className = 'hud-button';
@@ -431,22 +414,6 @@ if (fullscreenSupported()) {
             updateFullscreenBtnLabel();
         }
     });
-}
-
-// Update camera mode indicator
-function updateCameraModeIndicator() {
-    let modeText = 'CAMERA: ';
-    if (isInCinematic) {
-        modeText += 'CINEMATIC';
-        cameraModeIndicator.style.background = 'rgba(100, 100, 150, 0.7)';
-    } else if (currentCameraMode === CAMERA_MODES.FOLLOW) {
-        modeText += 'FOLLOW';
-        cameraModeIndicator.style.background = 'rgba(0, 0, 0, 0.5)';
-    } else if (currentCameraMode === CAMERA_MODES.ORBIT) {
-        modeText += 'ORBIT';
-        cameraModeIndicator.style.background = 'rgba(0, 0, 0, 0.5)';
-    }
-    cameraModeIndicator.textContent = modeText;
 }
 
 // Set up initial camera position for orbit mode reference
@@ -550,8 +517,9 @@ scene.add(dots);
 // Import and initialize boat system
 import { initBoat, updateBoat, boatPosition, boatRotation, boatGeometry, keys } from './boat.js';
 import { initWaveSampling } from './wave-sampling.js';
-import { initBuoys, updateBuoys, interactWithBuoy, getCurrentHighlightedBuoy, updateTextSprites, buoys } from './buoy.js';
+import { initBuoys, updateBuoys, interactWithBuoy, getCurrentHighlightedBuoy, updateTextSprites, buoys, buoyContent } from './buoy.js';
 import { showControlsModal, showWelcomeModal } from './modal.js';
+import { showMenu } from './menu.js';
 import { initTrails, updateTrails } from './trails.js';
 
 
@@ -797,9 +765,7 @@ function updateMobileHUD() {
 // Force landscape orientation on mobile
 function enforceLandscape() {
     if (isMobile && screen.orientation && screen.orientation.lock) {
-        screen.orientation.lock('landscape').catch(err => {
-            console.log('Could not lock to landscape:', err);
-        });
+        screen.orientation.lock('landscape').catch(() => {});
     }
 
     // Create orientation warning for portrait
@@ -933,15 +899,12 @@ if (isMobile) {
 document.addEventListener('keydown', (event) => {
 	if (event.code === 'KeyE') {
 		event.preventDefault();
-		console.log('E key pressed - checking for modal or interaction');
 
-		// Check if SweetAlert2 modal is currently open
+		// Ignore E key while a modal is open
 		if (document.querySelector('.swal2-container')) {
-			console.log('Modal is open, ignoring E key');
-			return; // Don't process E key if modal is open
+			return;
 		}
 
-		console.log('No modal open, processing E key for interaction');
 		interactWithBuoy(THREE, scene, startCinematicTransition, () => switchCameraMode(CAMERA_MODES.FOLLOW));
 	}
 	if (event.code === 'KeyC') {
@@ -973,9 +936,6 @@ function animate() {
 	} else if (currentCameraMode === CAMERA_MODES.CINEMATIC || isInCinematic) {
 		updateCinematicCamera();
 	}
-
-	// Update camera mode indicator
-	updateCameraModeIndicator();
 
 	material.uniforms.uTime.value += 0.02;
 
@@ -1047,6 +1007,17 @@ document.addEventListener('DOMContentLoaded', () => {
             showWelcomeModal();
             localStorage.setItem('oceanPortfolioWelcomeShown', 'true');
         }, 1000);
+    }
+
+    // Setup menu button (About + Projects + Contact overlay)
+    const menuBtn = document.getElementById('menu-btn');
+    if (menuBtn) {
+        const openMenu = () => showMenu(buoyContent);
+        menuBtn.onclick = openMenu;
+        menuBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            openMenu();
+        }, { passive: false });
     }
 
     // Setup info button

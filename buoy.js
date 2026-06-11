@@ -12,7 +12,9 @@ const buoyPositions = [
     { x: -50, z: 25 },  // North-west (farther out)
     { x: 55, z: -40 },  // South-east (farther out)
     { x: -35, z: -45 }, // South-west (farther out)
-    { x: 0, z: 65 }     // Far north (much farther)
+    { x: 0, z: 65 },    // Far north (much farther)
+    { x: 0, z: -75 },   // Far south (LLMNL)
+    { x: -70, z: 0 }    // Far west (Ponus)
 ];
 
 const INTERACTION_DISTANCE = 40; // Much larger for easier interaction
@@ -132,7 +134,7 @@ function removeInteractionRing(buoy) {
 }
 
 // Buoy content (placeholder data)
-const buoyContent = [
+export const buoyContent = [
     {
         id: 1,
         title: "Enterprise Automotive Operations Orchestrator",
@@ -148,7 +150,7 @@ const buoyContent = [
         country: "Uruguay",
         problem: "A major international financial institution required up to 6 months and over $15,000 in expert labor to manually synthesize a single Operations Manual (MOP). The process involved cross-referencing thousands of pages of technical specifications, legal frameworks, and complex financial matrices, creating a massive bottleneck for project deployment.",
         timeline: "2024 - 2 months • Lead Full-stack AI Engineer",
-        solution: "Architected a production-ready RAG pipeline that automates the end-to-end synthesis of technical documentation. Integrated Azure Document Intelligence for high-fidelity extraction of unstructured data and tables, coupled with Azure AI Search for semantic context retrieval. Engineered a sophisticated orchestration layer using GPT-4o to generate compliant document sections—including hierarchical objectives, result matrices, and multi-year financial disbursement schedules—with strict JSON-schema validation and automated DOCX assembly. The system reduced document generation time from 6 months to just 4 minutes, with operational costs dropping from thousands of dollars to cents per execution.",
+        solution: "Architected a production-ready RAG pipeline that automates the end-to-end synthesis of technical documentation. Integrated Azure Document Intelligence for high-fidelity extraction of unstructured data and tables, coupled with Azure AI Search for semantic context retrieval. Engineered a sophisticated orchestration layer using GPT-4o to generate compliant document sections, including hierarchical objectives, result matrices, and multi-year financial disbursement schedules, with strict JSON-schema validation and automated DOCX assembly. The system reduced document generation time from 6 months to just 4 minutes, with operational costs dropping from thousands of dollars to cents per execution.",
         tags: ["GPT-4o", "Azure AI Search", "Document Intelligence", "RAG", "FastAPI", "Automated Synthesis", "DOCX Automation"]
     },
     {
@@ -177,6 +179,24 @@ const buoyContent = [
         timeline: "3 months • Sole Full-stack Engineer",
         solution: "Built and shipped two coordinated production systems. (1) An agentic customer-facing assistant implemented as a LangGraph state machine, integrating directly with existing workshop APIs to let fleet customers query vehicles, service history, invoices, and upcoming scheduling without navigating large operational datasets. The agent streams responses/events for UI feedback, maintains session-level memory, supports multilingual interactions, and can retrieve internal knowledge from a Confluence-backed vector store. (2) A separate notification/sync service: a Celery + RabbitMQ rule engine that evaluates maintenance, ITV, washing and daily summary rules against large CosmosDB-backed historical data (plus external signals like weather), then dispatches notifications across channels (in-app/chat surfaces and WhatsApp via Twilio).",
         tags: ["Agentic Systems", "LangGraph", "Azure OpenAI", "FastAPI", "CosmosDB", "Celery", "RabbitMQ", "Twilio", "Vector Search"]
+    },
+    {
+        id: 6,
+        title: "LLMNL",
+        country: "Ireland",
+        problem: "Zyte crawls huge volumes of web data for clients. Before that data ships, someone has to answer a deceptively simple question: is it actually right? Are the fields filled in, are the images real, did we miss any products, does it match the live site? Spot-checking by hand doesn't scale to thousands of jobs, and dumb rule-checks miss everything that needs judgment.",
+        timeline: "2026 • AI/ML Engineer @ Zyte",
+        solution: "Built LLMNL (pronounced \"liminal\"), an AI data-QA engine that doesn't just rule-check: it investigates like a senior developer. Each of its six checks is a sandboxed LangGraph deep agent that reads the spider's own source code, profiles the dataset deterministically (HyperLogLog, reservoir sampling, no ML overhead), and re-crawls the live site or calls the Zyte API on demand, only when a verdict actually needs it. It returns an auditable pass / fail / needs-review backed by concrete evidence, callable directly over MCP. Evolution, a Next.js + FastAPI platform on top, runs it on a schedule or straight from Jira/Freshdesk tickets. In production today, fully traced in Langfuse, at roughly $0.15 to $0.80 per run.",
+        tags: ["LLM", "MCP", "Deep Agents", "LangGraph", "Gemini", "FastAPI", "Next.js", "Langfuse", "Celery", "GCP"]
+    },
+    {
+        id: 7,
+        title: "Ponus",
+        country: "Uruguay",
+        problem: "Cyclists had to pay around $30 a month for the training analytics their competitors locked behind a subscription, even though the raw data already lived on their own devices.",
+        timeline: "2023 - 2025 • Co-Founder",
+        solution: "Co-founded Ponus, a cycling app that synced with Garmin to compute a rider's full training metrics. Riders could track their analytics, sign up for events, and connect with their coaches, who sent workouts and instructions straight through the app. Built as an Angular PWA on a .NET Core backend with MongoDB, deployed on AWS.",
+        tags: [".NET Core", "Angular", "PWA", "MongoDB", "Garmin API", "AWS"]
     }
 ];
 
@@ -229,7 +249,7 @@ export function initBuoys(scene, THREE) {
 
             const measureCanvas = document.createElement('canvas');
             const measureContext = measureCanvas.getContext('2d');
-            measureContext.font = `Bold ${fontSize}px Arial`;
+            measureContext.font = `600 ${fontSize}px "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif`;
 
             const metrics = measureContext.measureText(title);
             const measuredTextWidth = metrics.width;
@@ -256,14 +276,14 @@ export function initBuoys(scene, THREE) {
             context.scale(dpr, dpr);
             context.clearRect(0, 0, bgWidth, bgHeight);
 
-            context.font = `Bold ${fontSize}px Arial`;
+            context.font = `600 ${fontSize}px "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif`;
             context.textAlign = 'center';
             context.textBaseline = 'middle';
 
             // Draw rounded background rectangle
-            context.fillStyle = 'rgba(0, 0, 0, 0.8)';
-            context.strokeStyle = '#ffffff';
-            context.lineWidth = borderWidth;
+            context.fillStyle = 'rgba(10, 10, 12, 0.62)';
+            context.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+            context.lineWidth = 2;
 
             context.beginPath();
             if (context.roundRect) {
@@ -280,11 +300,12 @@ export function initBuoys(scene, THREE) {
             context.stroke();
 
             // Draw the text
-            context.fillStyle = '#ffffff';
-            context.strokeStyle = '#000000';
-            context.lineWidth = outlineWidth;
-            context.strokeText(title, bgWidth / 2, bgHeight / 2);
+            context.save();
+            context.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            context.shadowBlur = 10;
+            context.fillStyle = 'rgba(255, 255, 255, 0.94)';
             context.fillText(title, bgWidth / 2, bgHeight / 2);
+            context.restore();
 
             const textTexture = new THREE.CanvasTexture(canvas);
             textTexture.generateMipmaps = false; // Prevent texture blurring
@@ -348,7 +369,6 @@ export function initBuoys(scene, THREE) {
     }, (progress) => {
     }, (error) => {
         console.error('Error loading buoy model:', error);
-        console.log('Falling back to simple geometry buoys');
         // Fallback to simple geometry if GLB fails
         createFallbackBuoys(scene, THREE);
     });
@@ -356,7 +376,6 @@ export function initBuoys(scene, THREE) {
     // If model takes too long to load, show fallback after 5 seconds
     setTimeout(() => {
         if (buoys.length === 0) {
-            console.log('Buoy model loading timeout, using fallback');
             createFallbackBuoys(scene, THREE);
         }
     }, 5000);

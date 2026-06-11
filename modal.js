@@ -4,7 +4,14 @@ export { showProjectModal, showControlsModal, showWelcomeModal };
 // Project details modal
 function showProjectModal(content, switchToFollowMode) {
     // Check if this is the special project for enhanced presentation
-    const isSpecialProject = content.id === 4;
+    const isFinanceProject = content.id === 4;
+    const isLLMNLProject = content.title === 'LLMNL';
+    const isSpecialProject = isFinanceProject || isLLMNLProject;
+
+    // Analytics: record which project was opened
+    if (window.goatcounter && window.goatcounter.count) {
+        window.goatcounter.count({ path: 'project/' + content.title, title: content.title, event: true });
+    }
 
     // Create modal container
     const modal = document.createElement('div');
@@ -56,7 +63,7 @@ function showProjectModal(content, switchToFollowMode) {
     let contentDiv;
 
     // Enhanced content for the special project
-    if (isSpecialProject) {
+    if (isFinanceProject) {
         contentDiv = document.createElement('div');
         contentDiv.innerHTML = `
 
@@ -531,6 +538,240 @@ function showProjectModal(content, switchToFollowMode) {
                 setTimeout(() => initializeMermaid(), 1000);
             }
         }, 100);
+    } else if (isLLMNLProject) {
+        contentDiv = document.createElement('div');
+        contentDiv.innerHTML = `
+
+            <div style="text-align: center; margin-bottom: 8px;">
+                <h1 style="color: rgba(255,255,255,0.92); margin: 0 0 6px; font-size: 2.35em; font-weight: 650; font-family: 'Fraunces', ui-serif, Georgia, serif; letter-spacing: 0.01em;">${content.title}</h1>
+                <div style="color: rgba(255,255,255,0.58); font-size: 0.86em; letter-spacing: 0.06em;">pronounced <em>liminal</em> &nbsp;·&nbsp; ${content.timeline}</div>
+                <div style="width: 84px; height: 1px; background: rgba(255,255,255,0.16); margin: 14px auto 0;"></div>
+            </div>
+
+            <!-- Philosophy line -->
+            <div style="text-align: center; margin-bottom: 18px;">
+                <p style="margin: 0; color: rgba(255,255,255,0.62); font-style: italic; font-family: 'Fraunces', ui-serif, Georgia, serif; font-size: 1.05em;">"The harness is the asset, the model is the commodity."</p>
+            </div>
+
+            <!-- Problem Section -->
+            <div style="margin-bottom: 14px; padding: 16px 16px 14px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">Problem</div>
+                <p style="margin: 0; color: rgba(255,255,255,0.78); font-size: 1.02em; line-height: 1.7;">${content.problem}</p>
+            </div>
+
+            <!-- Solution Section -->
+            <div style="margin-bottom: 18px; padding: 16px 16px 14px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">Solution</div>
+                <p style="margin: 0; color: rgba(255,255,255,0.78); font-size: 1.02em; line-height: 1.7;">${content.solution}</p>
+            </div>
+
+            <!-- What makes it smart -->
+            <div style="margin-bottom: 18px; padding: 16px 16px 14px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px;">What makes it smart</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;">
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Reads the spider's code</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Understands what the crawl was meant to extract before judging its output: intent, not just results.</small>
+                    </div>
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Re-crawls only when needed</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Fetches the live site or calls the Zyte API on demand to confirm a verdict: targeted, never brute force.</small>
+                    </div>
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Deterministic at scale</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Profiles datasets with HyperLogLog and reservoir sampling: millions of items, no ML overhead, repeatable results.</small>
+                    </div>
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Right model per job</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Per-role routing: fast models for inspectors, a high-reasoning model for the heavy comparison lead.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Mermaid Architecture Diagram -->
+            <div style="margin-bottom: 18px; padding: 18px 18px 14px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                <div style="text-align: center; color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px;">System Architecture</div>
+
+                <div id="llmnl-mermaid-diagram" style="display: flex; justify-content: center;">
+                    <div class="llmnl-mermaid" style="width: 100%; max-width: 900px; background: rgba(0,0,0,0.18); padding: 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12);">
+                        graph LR
+                            TRIGGERS["Triggers"]
+                            EVOLUTION["Evolution"]
+                            ENGINE["LLMNL Engine"]
+                            CHECKS["6 QA Deep Agents"]
+                            VERDICT["Verdict + Evidence"]
+
+                            classDef nodeStyle fill:#0d0d10,stroke:#bdbdbd,stroke-width:2px,color:#ffffff
+
+                            TRIGGERS:::nodeStyle
+                            EVOLUTION:::nodeStyle
+                            ENGINE:::nodeStyle
+                            CHECKS:::nodeStyle
+                            VERDICT:::nodeStyle
+
+                            TRIGGERS --> EVOLUTION
+                            EVOLUTION --> ENGINE
+                            ENGINE --> CHECKS
+                            CHECKS --> VERDICT
+                            VERDICT -.->|findings| EVOLUTION
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 12px; font-size: 0.9em; color: rgba(255,255,255,0.62);">
+                    <strong>Click any node for details.</strong>
+                </div>
+            </div>
+
+            <!-- The Six Checks -->
+            <div style="margin-bottom: 18px; padding: 16px 16px 14px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px;">The Six Checks</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;">
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Field coverage</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Are the expected fields actually filled in?</small>
+                    </div>
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Image verification</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Are the images real, correct, and not broken?</small>
+                    </div>
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Item coverage</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Did we capture every item, with no missing products?</small>
+                    </div>
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Schema validation</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Is the data in the right shape and format?</small>
+                    </div>
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Manual comparison</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Does the scraped data match the live website?</small>
+                    </div>
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Bug-fix verification</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Was a previously reported issue genuinely fixed?</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Why it matters + Technologies -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px;">
+                <div style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                    <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px;">Why it matters</div>
+                    <ul style="color: rgba(255,255,255,0.72); margin: 0; padding-left: 18px; line-height: 1.75;">
+                        <li>Catches data-quality issues automatically, before a client notices</li>
+                        <li>Validates thousands of items in parallel, not just spot-checks</li>
+                        <li>Every verdict is traceable, with supporting evidence</li>
+                        <li>Already in production on real audit workloads</li>
+                    </ul>
+                </div>
+                <div style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                    <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px;">Technologies</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        ${content.tags.map(tag => `<span style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.74); padding: 5px 10px; border-radius: 999px; font-size: 0.78em; border: 1px solid rgba(255,255,255,0.12);">${tag}</span>`).join('')}
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 14px;">
+                <button id="close-modal-btn" style="
+                    background: rgba(255,255,255,0.92);
+                    color: rgba(0,0,0,0.92);
+                    border: 1px solid rgba(255,255,255,0.10);
+                    padding: 12px 18px;
+                    border-radius: 999px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    font-weight: 600;
+                    transition: transform 160ms ease, opacity 160ms ease;
+                    min-width: 120px;
+                    min-height: 42px;
+                    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+                    -webkit-tap-highlight-color: transparent;
+                    -webkit-touch-callout: none;
+                    -webkit-user-select: none;
+                    -moz-user-select: none;
+                    -ms-user-select: none;
+                    user-select: none;
+                    opacity: 0.95;
+                ">Close</button>
+            </div>
+
+        `;
+
+        modalContent.appendChild(contentDiv);
+
+        // Render the LLMNL architecture diagram and wire up node clicks
+        const initLLMNLMermaid = () => {
+            mermaid.initialize({
+                startOnLoad: false,
+                theme: 'dark',
+                themeVariables: {
+                    primaryColor: '#0d0d10',
+                    primaryTextColor: 'rgba(255,255,255,0.92)',
+                    primaryBorderColor: 'rgba(255,255,255,0.22)',
+                    lineColor: 'rgba(255,255,255,0.22)',
+                    mainBkg: 'rgba(12, 12, 14, 0.86)',
+                    textColor: 'rgba(255,255,255,0.92)',
+                    fontFamily: '"IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif'
+                },
+                flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis', nodeSpacing: 100, rankSpacing: 70 },
+                securityLevel: 'loose'
+            });
+
+            const style = document.createElement('style');
+            style.textContent = '.llmnl-mermaid svg{max-width:100%!important;width:100%!important;height:auto!important;max-height:260px}.llmnl-mermaid .node{cursor:pointer!important}.llmnl-mermaid .nodeLabel{font-size:15px!important}.llmnl-mermaid .edgeLabel{font-size:12px!important}.llmnl-mermaid .edge{stroke-width:2px!important}';
+            document.head.appendChild(style);
+
+            const showNodeDetails = (nodeText) => {
+                const text = (nodeText || '').toLowerCase();
+                let details = '';
+                if (text.includes('trigger')) {
+                    details = 'Triggers: runs start from a REST API, MCP tools, the Evolution UI, cron schedules, or Jira/Freshdesk ticket scanners. Every entry point is idempotent.';
+                } else if (text.includes('engine')) {
+                    details = 'LLMNL Engine: a FastAPI backend with a native MCP server. Owns every verdict, metric, and Zyte-specific rule; any developer\'s agent can call it directly.';
+                } else if (text.includes('evolution')) {
+                    details = 'Evolution: a Next.js 15 + FastAPI platform. Stores projects and configs, schedules runs, and lets the QA team approve, reject, or push findings into Jira/Freshdesk.';
+                } else if (text.includes('check')) {
+                    details = '6 QA Checks: built as LangGraph deep agents (plus one deterministic schema check). Each runs in its own sandbox with its own shell, folder, and permissions.';
+                } else if (text.includes('verdict')) {
+                    details = 'Verdict + Evidence: each check returns pass / fail / needs review plus typed evidence like screenshots, URLs, and log excerpts, landing in a persistent, auditable issue ledger.';
+                }
+                if (!details) return;
+                let detailEl = modalContent.querySelector('#llmnl-node-detail');
+                if (!detailEl) {
+                    detailEl = document.createElement('div');
+                    detailEl.id = 'llmnl-node-detail';
+                    detailEl.style.cssText = 'margin-top: 12px; padding: 12px 14px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.10); border-radius: 10px; color: rgba(255,255,255,0.78); font-size: 0.92em; line-height: 1.6;';
+                    const box = modalContent.querySelector('#llmnl-mermaid-diagram');
+                    if (box && box.parentNode) box.parentNode.appendChild(detailEl);
+                }
+                detailEl.textContent = details;
+            };
+
+            setTimeout(() => {
+                const els = modalContent.querySelectorAll('.llmnl-mermaid');
+                if (els.length > 0) {
+                    mermaid.init(undefined, els).then(() => {
+                        modalContent.querySelectorAll('.llmnl-mermaid .node').forEach(node => {
+                            node.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                showNodeDetails(node.textContent || node.innerText);
+                            });
+                            node.addEventListener('mouseenter', () => { node.style.opacity = '0.8'; });
+                            node.addEventListener('mouseleave', () => { node.style.opacity = '1'; });
+                        });
+                    });
+                }
+            }, 200);
+        };
+
+        setTimeout(() => {
+            if (typeof mermaid !== 'undefined') {
+                initLLMNLMermaid();
+            } else {
+                setTimeout(() => initLLMNLMermaid(), 1000);
+            }
+        }, 100);
     } else {
         // Standard modal for other projects
         contentDiv = document.createElement('div');
@@ -706,24 +947,24 @@ function showControlsModal() {
         <div style="display: ${isMobile ? 'none' : 'block'};">
             <h2 style="color: rgba(255,255,255,0.72); margin: 0 0 12px; font-size: 0.9em; letter-spacing: 0.14em; text-transform: uppercase;">Desktop</h2>
             <div style="margin-bottom: 18px; line-height: 1.75; color: rgba(255,255,255,0.72);">
-                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">WASD / Arrows</strong> — sail</div>
-                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">Shift</strong> — boost</div>
-                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">E</strong> — open buoy</div>
-                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">C</strong> — camera</div>
-                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">Mouse</strong> — orbit</div>
-                <div style="margin-bottom: 0;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">Scroll</strong> — zoom</div>
+                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">WASD / Arrows</strong> &middot; sail</div>
+                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">Shift</strong> &middot; boost</div>
+                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">E</strong> &middot; open buoy</div>
+                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">C</strong> &middot; camera</div>
+                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">Mouse</strong> &middot; orbit</div>
+                <div style="margin-bottom: 0;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">Scroll</strong> &middot; zoom</div>
             </div>
         </div>
 
         <div style="display: ${isMobile ? 'block' : 'none'};">
             <h2 style="color: rgba(255,255,255,0.72); margin: 0 0 12px; font-size: 0.9em; letter-spacing: 0.14em; text-transform: uppercase;">Mobile</h2>
             <div style="margin-bottom: 18px; line-height: 1.75; color: rgba(255,255,255,0.72);">
-                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">D‑pad</strong> — sail</div>
-                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">Boost</strong> — faster</div>
-                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">E</strong> — open buoy</div>
-                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">C</strong> — camera</div>
-                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">Drag</strong> — orbit</div>
-                <div style="margin-bottom: 0;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">Pinch</strong> — zoom</div>
+                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">D‑pad</strong> &middot; sail</div>
+                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">Boost</strong> &middot; faster</div>
+                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">E</strong> &middot; open buoy</div>
+                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">C</strong> &middot; camera</div>
+                <div style="margin-bottom: 8px;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">Drag</strong> &middot; orbit</div>
+                <div style="margin-bottom: 0;"><strong style="color: rgba(255,255,255,0.9); font-weight: 600;">Pinch</strong> &middot; zoom</div>
             </div>
         </div>
 
