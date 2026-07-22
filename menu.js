@@ -42,21 +42,23 @@ export function showMenu(buoyContent) {
         window.goatcounter.count({ path: 'menu-open', title: 'Menu overlay', event: true });
     }
 
-    // Order projects by importance for the overlay (independent of the 3D buoy layout)
-    const PROJECT_ORDER = [
-        'LLMNL',
-        'Multi-Agent Financial Companion',
-        'AI-Powered Operations Manual Synthesizer',
-        'Legal Research AI Orchestrator',
-        'Automotive Sector Conversational AI Platform',
-        'Enterprise Automotive Operations Orchestrator',
-        'Ponus'
+    // Group projects into sections for the overlay (independent of the 3D buoy layout).
+    // Hooks live on each project in buoyContent (p.hook), so the list stays single-source.
+    const SECTIONS = [
+        { label: 'Flagship', titles: ['LLMNL', 'Financial Companion'] },
+        { label: 'Client work', note: 'anonymized under NDA', titles: [
+            'The 4-Minute Manual',
+            'Ecuador Legal RAG',
+            'Fleet Copilot',
+            'Workshop ERP'
+        ] },
+        { label: 'Founder', titles: ['Ponus'] },
+        { label: 'Lab / weekend experiments', titles: ['CharruaDevs', 'Gaussian Splatting'] }
     ];
-    const rank = (title) => {
-        const i = PROJECT_ORDER.indexOf(title);
-        return i === -1 ? PROJECT_ORDER.length : i;
-    };
-    const ordered = [...buoyContent].sort((a, b) => rank(a.title) - rank(b.title));
+
+    // Flat, section-ordered list backing the click handlers by data-index.
+    const byTitle = (t) => buoyContent.find((p) => p.title === t);
+    const displayList = [];
 
     const modal = document.createElement('div');
     modal.id = 'menu-modal';
@@ -83,6 +85,7 @@ export function showMenu(buoyContent) {
         background: rgba(12, 12, 14, 0.86);
         border-radius: 14px;
         padding: 30px;
+        box-sizing: border-box;
         max-width: 760px;
         width: 90%;
         max-height: 90vh;
@@ -99,17 +102,40 @@ export function showMenu(buoyContent) {
         -webkit-backdrop-filter: blur(10px);
     `;
 
-    const projectRows = ordered.map((p, i) => `
+    const projectRow = (p, i) => `
         <button class="menu-project" data-index="${i}" style="
-            display: block; width: 100%; box-sizing: border-box; text-align: left; cursor: pointer;
+            display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; text-align: left; cursor: pointer;
             background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.10);
             border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; color: inherit;
             font-family: inherit; transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
         ">
-            <span style="display:block; font-weight:600; font-size:1.02em; color:rgba(255,255,255,0.92); margin-bottom:3px;">${p.title}</span>
-            <span style="display:block; font-size:0.84em; color:rgba(255,255,255,0.58);">${p.timeline}</span>
+            <span style="flex: 1; min-width: 0;">
+                <span style="display:block; font-weight:600; font-size:1.02em; color:rgba(255,255,255,0.92); margin-bottom:3px;">${p.title}</span>
+                ${p.hook ? `<span style="display:block; font-size:0.9em; color:rgba(255,255,255,0.74); margin-bottom:3px;">${p.hook}</span>` : ''}
+                <span style="display:block; font-size:0.82em; color:rgba(255,255,255,0.5);">${p.timeline}</span>
+            </span>
+            <span class="menu-project-chevron" aria-hidden="true" style="flex-shrink:0; color:rgba(255,255,255,0.4); font-size:1.5em; line-height:1; transition: transform 160ms ease, color 160ms ease;">›</span>
         </button>
-    `).join('');
+    `;
+
+    const projectRows = SECTIONS.map((section) => {
+        const rows = section.titles
+            .map(byTitle)
+            .filter(Boolean)
+            .map((p) => {
+                displayList.push(p);
+                return projectRow(p, displayList.length - 1);
+            })
+            .join('');
+        if (!rows) return '';
+        return `
+            <div style="display: flex; align-items: baseline; gap: 8px; margin: 4px 0 10px;">
+                <span style="font-size: 0.78em; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); font-weight: 600;">${section.label}</span>
+                ${section.note ? `<span style="font-size: 0.72em; color: rgba(255,255,255,0.4); font-style: italic;">${section.note}</span>` : ''}
+            </div>
+            <div style="margin-bottom: 16px;">${rows}</div>
+        `;
+    }).join('');
 
     content.innerHTML = `
         <div style="margin-bottom: 18px;">
@@ -129,7 +155,7 @@ export function showMenu(buoyContent) {
         ${TALK_IMAGE ? `<img src="${TALK_IMAGE}" alt="Joaquin Bonifacino presenting at Agentic AI Uruguay" onerror="this.style.display='none'" style="width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.10); margin-bottom: 12px; display: block;">` : ''}
         <div style="margin-bottom: 22px;">
             ${TALKS.map(t => `
-                <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.10); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px;">
+                <div style="border-left: 2px solid rgba(255,255,255,0.16); padding: 2px 0 2px 14px; margin-bottom: 14px;">
                     <span style="display: block; font-weight: 600; color: rgba(255,255,255,0.92); margin-bottom: 3px;">${t.title}</span>
                     <span style="display: block; font-size: 0.84em; color: rgba(255,255,255,0.58);">${t.meta}</span>
                 </div>
@@ -166,21 +192,29 @@ export function showMenu(buoyContent) {
     modal.appendChild(content);
     document.body.appendChild(modal);
 
-    const close = () => modal.remove();
+    const close = () => {
+        modal.remove();
+        document.removeEventListener('keydown', escapeHandler);
+    };
 
     content.querySelectorAll('.menu-project').forEach(btn => {
+        const chevron = btn.querySelector('.menu-project-chevron');
         btn.addEventListener('mouseenter', () => {
             btn.style.background = 'rgba(255,255,255,0.08)';
             btn.style.borderColor = 'rgba(255,255,255,0.22)';
+            if (chevron) { chevron.style.transform = 'translateX(3px)'; chevron.style.color = 'rgba(255,255,255,0.8)'; }
         });
         btn.addEventListener('mouseleave', () => {
             btn.style.background = 'rgba(255,255,255,0.04)';
             btn.style.borderColor = 'rgba(255,255,255,0.10)';
+            if (chevron) { chevron.style.transform = 'translateX(0)'; chevron.style.color = 'rgba(255,255,255,0.4)'; }
         });
         btn.addEventListener('click', () => {
             const idx = parseInt(btn.getAttribute('data-index'), 10);
             close();
-            showProjectModal(ordered[idx], null);
+            // Reopen this menu when the project modal is closed, so the user
+            // returns here instead of dropping all the way back to the ocean.
+            showProjectModal(displayList[idx], () => showMenu(buoyContent));
         });
     });
 

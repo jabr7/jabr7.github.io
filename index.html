@@ -187,9 +187,18 @@
 			}
 		}
 
-		/* Prevent text selection on mobile */
+		/* Text is selectable by default. Only the interactive chrome (the 3D
+		   canvas, buttons and the mobile D-pad) opts out, so dragging the boat
+		   or tapping controls never grabs a text selection. */
 		* {
 			-webkit-touch-callout: none;
+		}
+
+		canvas,
+		button,
+		.hud-button,
+		#mobile-controls,
+		#mobile-controls * {
 			-webkit-user-select: none;
 			-khtml-user-select: none;
 			-moz-user-select: none;
@@ -197,13 +206,33 @@
 			user-select: none;
 		}
 
-		/* Allow text selection in modals */
-		.swal2-popup * {
-			-webkit-user-select: text;
-			-khtml-user-select: text;
-			-moz-user-select: text;
-			-ms-user-select: text;
-			user-select: text;
+		/* Mobile layout for the overlay modals. They are built with inline
+		   styles, so these rules reach in by id + attribute to (1) tighten the
+		   card padding, (2) collapse every multi-column grid to a single column,
+		   and (3) let flex/grid children shrink so a long line scrolls inside
+		   its box instead of pushing the whole page sideways. */
+		@media (max-width: 640px) {
+			#project-modal > div { padding: 22px 18px !important; }
+			#menu-modal > div { padding: 24px 18px !important; }
+
+			#project-modal div[style*="grid-template-columns"],
+			#menu-modal div[style*="grid-template-columns"] {
+				grid-template-columns: 1fr !important;
+			}
+
+			#project-modal *,
+			#menu-modal * { min-width: 0; }
+		}
+
+		/* Short viewports (phones in landscape, the enforced scene orientation):
+		   claw back vertical space so tall modals scroll inside almost the whole
+		   screen instead of being clipped top and bottom. */
+		@media (max-height: 500px) {
+			#project-modal > div,
+			#menu-modal > div {
+				max-height: 96vh !important;
+				margin: 8px !important;
+			}
 		}
 
 

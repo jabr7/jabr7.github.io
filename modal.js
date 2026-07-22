@@ -1,12 +1,24 @@
 // Modal system module - HTML modal functions
 export { showProjectModal, showControlsModal, showWelcomeModal };
 
+// Deep-link helpers: reflect the open project in the URL hash (via replaceState,
+// so it does not spam history or re-trigger the hashchange listener), so the
+// address bar is always shareable. main.js reads this hash on load.
+const slugifyTitle = (t) => (t || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+const setProjectHash = (title) => { try { history.replaceState(null, '', '#' + slugifyTitle(title)); } catch (e) {} };
+const clearProjectHash = () => { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} };
+
 // Project details modal
 function showProjectModal(content, switchToFollowMode) {
     // Check if this is the special project for enhanced presentation
     const isFinanceProject = content.id === 4;
     const isLLMNLProject = content.title === 'LLMNL';
-    const isSpecialProject = isFinanceProject || isLLMNLProject;
+    const isCharruaProject = content.title === 'CharruaDevs';
+    const isSplatProject = content.title === 'Gaussian Splatting';
+    const isSpecialProject = isFinanceProject || isLLMNLProject || isCharruaProject || isSplatProject;
+
+    // Reflect the open project in the URL so it can be shared/bookmarked.
+    setProjectHash(content.title);
 
     // Analytics: record which project was opened
     if (window.goatcounter && window.goatcounter.count) {
@@ -43,6 +55,7 @@ function showProjectModal(content, switchToFollowMode) {
         background: rgba(12, 12, 14, 0.86);
         border-radius: 14px;
         padding: ${isSpecialProject ? '40px' : '30px'};
+        box-sizing: border-box;
         max-width: ${maxWidth};
         width: ${modalWidth};
         max-height: 90vh;
@@ -68,7 +81,8 @@ function showProjectModal(content, switchToFollowMode) {
         contentDiv.innerHTML = `
 
             <div style="text-align: center; margin-bottom: 18px;">
-                <h1 style="color: rgba(255,255,255,0.92); margin: 0 0 10px; font-size: 2.35em; font-weight: 650; font-family: 'Fraunces', ui-serif, Georgia, serif; letter-spacing: 0.01em;">${content.title}</h1>
+                <h1 style="color: rgba(255,255,255,0.92); margin: 0 0 6px; font-size: 2.35em; font-weight: 650; font-family: 'Fraunces', ui-serif, Georgia, serif; letter-spacing: 0.01em;">${content.title}</h1>
+                ${content.subtitle ? `<div style="color: rgba(255,255,255,0.55); font-size: 0.86em; letter-spacing: 0.04em; margin-bottom: 10px;">${content.subtitle}</div>` : ''}
                 <div style="width: 84px; height: 1px; background: rgba(255,255,255,0.16); margin: 0 auto;"></div>
             </div>
 
@@ -772,12 +786,273 @@ function showProjectModal(content, switchToFollowMode) {
                 setTimeout(() => initLLMNLMermaid(), 1000);
             }
         }, 100);
+    } else if (isCharruaProject) {
+        contentDiv = document.createElement('div');
+        contentDiv.innerHTML = `
+
+            <div style="text-align: center; margin-bottom: 8px;">
+                <h1 style="color: rgba(255,255,255,0.92); margin: 0 0 6px; font-size: 2.35em; font-weight: 650; font-family: 'Fraunces', ui-serif, Georgia, serif; letter-spacing: 0.01em;">${content.title}</h1>
+                <div style="color: rgba(255,255,255,0.58); font-size: 0.86em; letter-spacing: 0.04em;">an SLM that talks like r/CharruaDevs 🧉 &nbsp;·&nbsp; ${content.timeline}</div>
+                <div style="width: 84px; height: 1px; background: rgba(255,255,255,0.16); margin: 14px auto 0;"></div>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 18px;">
+                <p style="margin: 0; color: rgba(255,255,255,0.62); font-style: italic; font-family: 'Fraunces', ui-serif, Georgia, serif; font-size: 1.05em;">"Change how a model speaks, not what it knows."</p>
+            </div>
+
+            <!-- Problem -->
+            <div style="margin-bottom: 14px; padding: 16px 16px 14px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">Why I built it</div>
+                <p style="margin: 0; color: rgba(255,255,255,0.78); font-size: 1.02em; line-height: 1.7;">${content.problem}</p>
+            </div>
+
+            <!-- Solution -->
+            <div style="margin-bottom: 18px; padding: 16px 16px 14px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">What I built</div>
+                <p style="margin: 0; color: rgba(255,255,255,0.78); font-size: 1.02em; line-height: 1.7;">${content.solution}</p>
+            </div>
+
+            <!-- See it talk: real model output -->
+            <div style="margin-bottom: 18px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 20px 60px rgba(0,0,0,0.35);">
+                <div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.10);">
+                    <span style="width: 11px; height: 11px; border-radius: 50%; background: #ff5f57; display: inline-block;"></span>
+                    <span style="width: 11px; height: 11px; border-radius: 50%; background: #febc2e; display: inline-block;"></span>
+                    <span style="width: 11px; height: 11px; border-radius: 50%; background: #28c840; display: inline-block;"></span>
+                    <span style="margin-left: auto; color: rgba(255,255,255,0.55); font-size: 0.78em; letter-spacing: 0.04em; font-family: ui-monospace, 'SFMono-Regular', 'Cascadia Code', Consolas, monospace;">charruadevs-4b</span>
+                </div>
+                <div style="padding: 16px 18px; background: rgba(0,0,0,0.42); font-family: ui-monospace, 'SFMono-Regular', 'Cascadia Code', Consolas, monospace; font-size: 0.9em; line-height: 1.55; overflow-x: auto;">
+                    <div style="color: rgba(255,255,255,0.5); margin-bottom: 14px;">$ ollama run jabr7/charruadevs-4b</div>
+
+                    <div style="color: rgba(127,214,194,0.95); margin-bottom: 5px;">&gt;&gt;&gt; Que opinan de Genexus? En la facultad nos lo estan enseñando</div>
+                    <div style="color: rgba(255,255,255,0.82); margin-bottom: 16px;">Genexus es una cagada de lo mas. A mi me lo enseñaron en la facultad y en mi primer proyecto me costo 4 meses hacer una mierda de app.</div>
+
+                    <div style="color: rgba(127,214,194,0.95); margin-bottom: 5px;">&gt;&gt;&gt; Uso ChatGPT para todo en el laburo y siento que no aprendo nada, les pasa?</div>
+                    <div style="color: rgba(255,255,255,0.82); margin-bottom: 16px;">Es muy comun, pero tenes que usarlo como una herramienta, no como un colega. Y sobre todo, tenes que leer lo que te dice. No copiar y pegar.</div>
+
+                    <div style="color: rgba(127,214,194,0.95); margin-bottom: 5px;">&gt;&gt;&gt; Me ofrecen el doble de sueldo en una empresa que usa tecnologia vieja, la agarro?</div>
+                    <div style="color: rgba(255,255,255,0.82); margin-bottom: 16px;">No. La tecnologia vieja no te da doble sueldo, pero si te da el doble de la tecnología actual.</div>
+
+                    <div style="color: rgba(127,214,194,0.95); margin-bottom: 5px;">&gt;&gt;&gt; Como esta el mercado IT en Uruguay?</div>
+                    <div style="color: rgba(255,255,255,0.82);">En mi caso, si, es muy dificil conseguir laburo. Tengo un titulo y un par de años de experiencia, y me han rechazado por tener poco conocimiento de ingles.</div>
+                </div>
+            </div>
+
+            <!-- Design decision -->
+            <div style="margin-bottom: 18px; padding: 16px 16px 14px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">The decision I liked most</div>
+                <p style="margin: 0; color: rgba(255,255,255,0.78); font-size: 1.02em; line-height: 1.7;">The LoRA adapters only touch the attention projections (q_proj, k_proj, v_proj, o_proj) and leave the MLP blocks completely frozen. Most of a transformer's factual knowledge lives in the MLPs, while attention controls how information gets routed and expressed. Since the goal was to transfer style and opinions rather than teach new facts, adapting only attention changes how the model speaks instead of what it knows, and it sharply cuts the risk of catastrophic forgetting on a small dataset.</p>
+            </div>
+
+            <!-- Lessons -->
+            <div style="margin-bottom: 18px; padding: 16px 16px 14px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px;">Lessons from the process</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;">
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Data composition beats hyperparameters</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Only 22% of my examples used voseo, so the gradient kept averaging the dialect away. Extra training steps did nothing; oversampling dialect-heavy examples fixed it.</small>
+                    </div>
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Alpha over rank is a volume knob</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Same trained weights, a higher alpha at inference means a noticeably stronger personality. The adapter is just 0.6% of the model's parameters but leaves a big mark.</small>
+                    </div>
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Style vs coherence is a real trade-off</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Ships two variants: a raw one on single post and comment pairs for maximum flavor, and a chat one on real comment threads that can actually hold a conversation.</small>
+                    </div>
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">Catastrophic forgetting bites fast</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Freezing the MLPs kept the base knowledge intact on such a small dataset. I learned that the hard way after abliterating a lot of small Gemma models.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Training setup + Try it -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px;">
+                <div style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                    <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px;">Training setup</div>
+                    <ul style="color: rgba(255,255,255,0.72); margin: 0; padding-left: 18px; line-height: 1.75;">
+                        <li>Base: Qwen3-4B-Instruct</li>
+                        <li>QLoRA, 4-bit base, rank 32 / alpha 64</li>
+                        <li>~11k real post and comment pairs</li>
+                        <li>Trained at home on one RTX 4060 Ti, 8GB</li>
+                    </ul>
+                </div>
+                <div style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                    <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px;">Try it in one line</div>
+                    <div style="display: flex; align-items: stretch; gap: 8px; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 10px 12px;">
+                        <code id="charrua-cmd" style="flex: 1; color: rgba(127,214,194,0.95); font-family: ui-monospace, 'SFMono-Regular', 'Cascadia Code', Consolas, monospace; font-size: 0.86em; overflow-x: auto; white-space: nowrap; align-self: center;">ollama run jabr7/charruadevs-4b</code>
+                        <button id="charrua-copy-btn" style="flex-shrink: 0; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.86); border: 1px solid rgba(255,255,255,0.16); border-radius: 8px; padding: 6px 12px; font-size: 0.78em; font-weight: 600; cursor: pointer; -webkit-tap-highlight-color: transparent;">Copy</button>
+                    </div>
+                    <small style="display: block; margin-top: 8px; color: rgba(255,255,255,0.55);">Replies in Rioplatense Spanish, with the subreddit's opinions.</small>
+                </div>
+            </div>
+
+            <!-- Links + tags -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px;">
+                <div style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                    <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px;">Get the model</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <a href="https://huggingface.co/Jabr7/charruadevs-4b" target="_blank" rel="noopener" style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.86); text-decoration: none; padding: 8px 14px; border-radius: 999px; font-size: 0.82em; font-weight: 500; border: 1px solid rgba(255,255,255,0.14);">Hugging Face ↗</a>
+                        <a href="https://ollama.com/jabr7/charruadevs-4b" target="_blank" rel="noopener" style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.86); text-decoration: none; padding: 8px 14px; border-radius: 999px; font-size: 0.82em; font-weight: 500; border: 1px solid rgba(255,255,255,0.14);">Ollama registry ↗</a>
+                    </div>
+                    <small style="display: block; margin-top: 8px; color: rgba(255,255,255,0.55);">LoRA adapter, GGUF and the training configs all live on Hugging Face.</small>
+                </div>
+                <div style="padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                    <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px;">Stack</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        ${content.tags.map(tag => `<span style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.74); padding: 5px 10px; border-radius: 999px; font-size: 0.78em; border: 1px solid rgba(255,255,255,0.12);">${tag}</span>`).join('')}
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 14px;">
+                <button id="close-modal-btn" style="
+                    background: rgba(255,255,255,0.92);
+                    color: rgba(0,0,0,0.92);
+                    border: 1px solid rgba(255,255,255,0.10);
+                    padding: 12px 18px;
+                    border-radius: 999px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    font-weight: 600;
+                    transition: transform 160ms ease, opacity 160ms ease;
+                    min-width: 120px;
+                    min-height: 42px;
+                    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+                    -webkit-tap-highlight-color: transparent;
+                    -webkit-user-select: none;
+                    user-select: none;
+                    opacity: 0.95;
+                ">Close</button>
+            </div>
+        `;
+
+        modalContent.appendChild(contentDiv);
+
+        // Wire the copy-to-clipboard button
+        const copyBtn = contentDiv.querySelector('#charrua-copy-btn');
+        if (copyBtn) {
+            copyBtn.onclick = () => {
+                const cmd = 'ollama run jabr7/charruadevs-4b';
+                const done = () => {
+                    copyBtn.textContent = 'Copied';
+                    setTimeout(() => { copyBtn.textContent = 'Copy'; }, 1500);
+                };
+                const fallback = () => {
+                    const cmdEl = contentDiv.querySelector('#charrua-cmd');
+                    const range = document.createRange();
+                    range.selectNodeContents(cmdEl);
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    try { document.execCommand('copy'); } catch (e) {}
+                    sel.removeAllRanges();
+                };
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(cmd).then(done).catch(() => { fallback(); done(); });
+                } else {
+                    fallback();
+                    done();
+                }
+            };
+        }
+    } else if (isSplatProject) {
+        contentDiv = document.createElement('div');
+        contentDiv.innerHTML = `
+
+            <div style="text-align: center; margin-bottom: 8px;">
+                <h1 style="color: rgba(255,255,255,0.92); margin: 0 0 6px; font-size: 2.35em; font-weight: 650; font-family: 'Fraunces', ui-serif, Georgia, serif; letter-spacing: 0.01em;">${content.title}</h1>
+                <div style="color: rgba(255,255,255,0.58); font-size: 0.86em; letter-spacing: 0.04em;">my bookshelf, captured in 3D &nbsp;·&nbsp; ${content.timeline}</div>
+                <div style="width: 84px; height: 1px; background: rgba(255,255,255,0.16); margin: 14px auto 0;"></div>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 18px;">
+                <p style="margin: 0; color: rgba(255,255,255,0.62); font-style: italic; font-family: 'Fraunces', ui-serif, Georgia, serif; font-size: 1.05em;">"Sometimes training teaches the world. Sometimes it just freezes one thing in high detail."</p>
+            </div>
+
+            <!-- Live embed -->
+            <div style="margin-bottom: 18px; padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; gap: 10px; flex-wrap: wrap;">
+                    <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase;">Navigate it live</div>
+                    <a href="https://superspl.at/scene/bd60f2d8" target="_blank" rel="noopener" style="color: rgba(127,214,194,0.9); text-decoration: none; font-size: 0.8em;">Open full screen ↗</a>
+                </div>
+                <div style="position: relative; width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.35);">
+                    <iframe src="https://superspl.at/scene/bd60f2d8" title="Gaussian Splatting scene of a bookshelf" allow="fullscreen; xr-spatial-tracking" allowfullscreen loading="lazy" style="width: 100%; height: 440px; border: 0; display: block;"></iframe>
+                </div>
+                <small style="display: block; margin-top: 8px; color: rgba(255,255,255,0.55);">Drag to orbit, scroll to zoom. Millions of gaussians, rendered live in your browser.</small>
+            </div>
+
+            <!-- Context -->
+            <div style="margin-bottom: 18px; padding: 16px 16px 14px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">What it is</div>
+                <p style="margin: 0 0 10px; color: rgba(255,255,255,0.78); font-size: 1.02em; line-height: 1.7;">${content.problem}</p>
+                <p style="margin: 0; color: rgba(255,255,255,0.78); font-size: 1.02em; line-height: 1.7;">${content.solution}</p>
+            </div>
+
+            <!-- How it works -->
+            <div style="margin-bottom: 18px; padding: 16px 16px 14px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 12px;">How it works</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px;">
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">1 · Find the cameras</strong>
+                        <small style="color: rgba(255,255,255,0.62);">COLMAP solves Structure from Motion: the exact position and angle of every photo, plus a rough point cloud. Get this wrong and nothing downstream works.</small>
+                    </div>
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">2 · Millions of splats</strong>
+                        <small style="color: rgba(255,255,255,0.62);">The scene becomes millions of tiny oriented gaussians, each with a position, a shape, a color and an opacity. The oriented ellipsoid is what makes them splats, not plain points.</small>
+                    </div>
+                    <div style="padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+                        <strong style="color: rgba(255,255,255,0.92); font-weight: 600; display: block; margin-bottom: 4px;">3 · Differentiable rendering</strong>
+                        <small style="color: rgba(255,255,255,0.62);">Render from a known angle, compare against the real photo, nudge every parameter to close the gap, and repeat a few thousand times. Plain gradient descent, same loop as any neural net.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- The surprise -->
+            <div style="margin-bottom: 18px; padding: 16px 16px 14px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px;">What surprised me</div>
+                <p style="margin: 0 0 10px; color: rgba(255,255,255,0.78); font-size: 1.02em; line-height: 1.7;">I spend most of my time around LLMs, where the model is trained once and heavily, then used cheaply everywhere. I assumed splatting worked the same way. It does not. The model you end up with is just the scene itself. I did not train "a splatting model", I trained this specific bookshelf, from zero.</p>
+                <p style="margin: 0; color: rgba(255,255,255,0.78); font-size: 1.02em; line-height: 1.7;">A different room tomorrow is a whole new run: COLMAP again, ~30k steps again, from scratch. There is no transfer and no general understanding underneath, unlike a world model like JEPA. It only knows the thing I pointed my camera at. Same word, "training", very different thing going on underneath.</p>
+            </div>
+
+            <!-- Tags -->
+            <div style="margin-bottom: 18px; padding: 14px 14px 12px; background: rgba(255,255,255,0.04); border-radius: 12px; border: 1px solid rgba(255,255,255,0.10);">
+                <div style="color: rgba(255,255,255,0.68); font-size: 0.82em; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px;">Stack</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    ${content.tags.map(tag => `<span style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.74); padding: 5px 10px; border-radius: 999px; font-size: 0.78em; border: 1px solid rgba(255,255,255,0.12);">${tag}</span>`).join('')}
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 14px;">
+                <button id="close-modal-btn" style="
+                    background: rgba(255,255,255,0.92);
+                    color: rgba(0,0,0,0.92);
+                    border: 1px solid rgba(255,255,255,0.10);
+                    padding: 12px 18px;
+                    border-radius: 999px;
+                    cursor: pointer;
+                    font-size: 12px;
+                    font-weight: 600;
+                    transition: transform 160ms ease, opacity 160ms ease;
+                    min-width: 120px;
+                    min-height: 42px;
+                    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+                    -webkit-tap-highlight-color: transparent;
+                    -webkit-user-select: none;
+                    user-select: none;
+                    opacity: 0.95;
+                ">Close</button>
+            </div>
+        `;
+
+        modalContent.appendChild(contentDiv);
     } else {
         // Standard modal for other projects
         contentDiv = document.createElement('div');
         contentDiv.innerHTML = `
             <div style="text-align: center; margin-bottom: 18px;">
-                <h1 style="color: rgba(255,255,255,0.92); margin: 0 0 10px; font-size: 2.0em; font-weight: 650; font-family: 'Fraunces', ui-serif, Georgia, serif; letter-spacing: 0.01em;">${content.title}</h1>
+                <h1 style="color: rgba(255,255,255,0.92); margin: 0 0 6px; font-size: 2.0em; font-weight: 650; font-family: 'Fraunces', ui-serif, Georgia, serif; letter-spacing: 0.01em;">${content.title}</h1>
+                ${content.subtitle ? `<div style="color: rgba(255,255,255,0.55); font-size: 0.86em; letter-spacing: 0.04em; margin-bottom: 10px;">${content.subtitle}</div>` : ''}
                 <div style="width: 84px; height: 1px; background: rgba(255,255,255,0.16); margin: 0 auto;"></div>
             </div>
 
@@ -840,10 +1115,13 @@ function showProjectModal(content, switchToFollowMode) {
     // Get the close button from the content and add click handler
     const closeBtn = contentDiv.querySelector('#close-modal-btn');
 
-    // Function to close modal
+    // Single close path used by the button, the backdrop and Escape: remove the
+    // modal, drop the Escape listener (so they do not pile up across opens),
+    // clear the deep-link hash, and hand control back to the caller.
     const closeModal = () => {
-        console.log('Modal closed');
         modal.remove();
+        document.removeEventListener('keydown', escapeHandler);
+        clearProjectHash();
         if (switchToFollowMode) switchToFollowMode();
     };
 
@@ -861,12 +1139,10 @@ function showProjectModal(content, switchToFollowMode) {
     // Add touch events for mobile
     closeBtn.addEventListener('touchstart', (e) => {
         e.preventDefault(); // Prevent default touch behavior
-        console.log('Touch start on close button');
     }, { passive: false });
 
     closeBtn.addEventListener('touchend', (e) => {
         e.preventDefault(); // Prevent default touch behavior
-        console.log('Touch end on close button');
         closeModal();
     }, { passive: false });
 
@@ -876,19 +1152,12 @@ function showProjectModal(content, switchToFollowMode) {
 
     // Close on outside click (only if clicking the modal backdrop, not the content)
     modal.onclick = (e) => {
-        if (e.target === modal) {
-            modal.remove();
-            if (switchToFollowMode) switchToFollowMode();
-        }
+        if (e.target === modal) closeModal();
     };
 
     // Close on escape
     const escapeHandler = (e) => {
-        if (e.code === 'Escape') {
-            modal.remove();
-            if (switchToFollowMode) switchToFollowMode();
-            document.removeEventListener('keydown', escapeHandler);
-        }
+        if (e.code === 'Escape') closeModal();
     };
     document.addEventListener('keydown', escapeHandler);
 }

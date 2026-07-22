@@ -520,6 +520,7 @@ import { initWaveSampling } from './wave-sampling.js';
 import { initBuoys, updateBuoys, interactWithBuoy, getCurrentHighlightedBuoy, updateTextSprites, buoys, buoyContent } from './buoy.js';
 import { showControlsModal, showWelcomeModal } from './modal.js';
 import { showMenu } from './menu.js';
+import { showProjectModal } from './modal.js';
 import { initTrails, updateTrails } from './trails.js';
 
 
@@ -778,6 +779,7 @@ function enforceLandscape() {
             left: 0;
             width: 100%;
             height: 100%;
+            box-sizing: border-box;
             background: rgba(0, 0, 0, 0.9);
             color: #fff;
             display: flex;
@@ -1019,6 +1021,20 @@ document.addEventListener('DOMContentLoaded', () => {
             openMenu();
         }, { passive: false });
     }
+
+    // Deep links: /#project-slug opens that project's modal directly, so a
+    // LinkedIn post can point straight at it. Slug is the lowercased title.
+    const slugify = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const openProjectFromHash = () => {
+        const slug = (location.hash || '').replace(/^#/, '').trim();
+        if (!slug) return;
+        if (document.getElementById('project-modal')) return; // already open
+        const match = buoyContent.find((p) => slugify(p.title) === slug);
+        if (match) showProjectModal(match, null);
+    };
+    window.addEventListener('hashchange', openProjectFromHash);
+    // Open on initial load, once buoy content is ready.
+    setTimeout(openProjectFromHash, 300);
 
     // Setup info button
     const infoBtn = document.getElementById('info-btn');

@@ -14,7 +14,9 @@ const buoyPositions = [
     { x: -35, z: -45 }, // South-west (farther out)
     { x: 0, z: 65 },    // Far north (much farther)
     { x: 0, z: -75 },   // Far south (LLMNL)
-    { x: -70, z: 0 }    // Far west (Ponus)
+    { x: -70, z: 0 },   // Far west (Ponus)
+    { x: 72, z: 58 },   // North-east far (CharruaDevs)
+    { x: -58, z: -62 }  // South-west far (Gaussian Splatting)
 ];
 
 const INTERACTION_DISTANCE = 40; // Much larger for easier interaction
@@ -137,7 +139,9 @@ function removeInteractionRing(buoy) {
 export const buoyContent = [
     {
         id: 1,
-        title: "Enterprise Automotive Operations Orchestrator",
+        title: "Workshop ERP",
+        subtitle: "Enterprise automotive operations orchestrator",
+        hook: "Automotive operations, .NET + Angular",
         country: "Spain",
         problem: "A leading automotive service network faced significant operational friction due to decentralized management of service centers, fragmented inventory tracking, and complex workforce scheduling across multiple European regions.",
         timeline: "2025 - 4 months • Full-stack Engineer (Team of 6)",
@@ -146,7 +150,9 @@ export const buoyContent = [
     },
     {
         id: 2,
-        title: "AI-Powered Operations Manual Synthesizer",
+        title: "The 4-Minute Manual",
+        subtitle: "AI-powered operations manual synthesizer",
+        hook: "6 months of drafting, down to 4 minutes",
         country: "Uruguay",
         problem: "A major international financial institution required up to 6 months and over $15,000 in expert labor to manually synthesize a single Operations Manual (MOP). The process involved cross-referencing thousands of pages of technical specifications, legal frameworks, and complex financial matrices, creating a massive bottleneck for project deployment.",
         timeline: "2024 - 2 months • Lead Full-stack AI Engineer",
@@ -155,7 +161,9 @@ export const buoyContent = [
     },
     {
         id: 3,
-        title: "Legal Research AI Orchestrator",
+        title: "Ecuador Legal RAG",
+        subtitle: "Legal research AI orchestrator",
+        hook: "Cited answers over Ecuadorian law",
         country: "Ecuador",
         problem: "Navigating vast, unstructured legal knowledge bases in Ecuador required high precision and context-aware retrieval to avoid hallucinations in sensitive legal advice.",
         timeline: "2024 - 6 months • Sole Full-stack AI Engineer",
@@ -164,7 +172,9 @@ export const buoyContent = [
     },
     {
         id: 4,
-        title: "Multi-Agent Financial Companion",
+        title: "Financial Companion",
+        subtitle: "Multi-agent financial companion",
+        hook: "Multi-agent money coach",
         country: "USA",
         problem: "Traditional financial management is often fragmented, reactive, and emotionally taxing. Users struggle to maintain context across long-term goals, while tools remain disconnected from the nuanced emotional relationship people have with their money.",
         timeline: "2025 - 2026 - 6 months• Lead Architect (Team of 10)",
@@ -173,7 +183,9 @@ export const buoyContent = [
     },
     {
         id: 5,
-        title: "Automotive Sector Conversational AI Platform",
+        title: "Fleet Copilot",
+        subtitle: "Automotive sector conversational AI platform",
+        hook: "Agentic assistant for vehicle fleets",
         country: "Spain",
         problem: "Legacy customer service workflows created long turnaround times for vehicle-related queries. Users needed to navigate multiple disconnected systems to access vehicle information, service history, and scheduling, leading to fragmented experiences and increased support overhead. Knowledge base updates required manual processes, and proactive notifications for vehicle maintenance were non-existent.",
         timeline: "3 months • Sole Full-stack Engineer",
@@ -183,6 +195,7 @@ export const buoyContent = [
     {
         id: 6,
         title: "LLMNL",
+        hook: "AI data-QA that investigates like a senior dev",
         country: "Ireland",
         problem: "Zyte crawls huge volumes of web data for clients. Before that data ships, someone has to answer a deceptively simple question: is it actually right? Are the fields filled in, are the images real, did we miss any products, does it match the live site? Spot-checking by hand doesn't scale to thousands of jobs, and dumb rule-checks miss everything that needs judgment.",
         timeline: "2026 • AI/ML Engineer @ Zyte",
@@ -192,13 +205,136 @@ export const buoyContent = [
     {
         id: 7,
         title: "Ponus",
+        hook: "Cycling analytics, synced with Garmin",
         country: "Uruguay",
         problem: "Cyclists had to pay around $30 a month for the training analytics their competitors locked behind a subscription, even though the raw data already lived on their own devices.",
         timeline: "2023 - 2025 • Co-Founder",
         solution: "Co-founded Ponus, a cycling app that synced with Garmin to compute a rider's full training metrics. Riders could track their analytics, sign up for events, and connect with their coaches, who sent workouts and instructions straight through the app. Built as an Angular PWA on a .NET Core backend with MongoDB, deployed on AWS.",
         tags: [".NET Core", "Angular", "PWA", "MongoDB", "Garmin API", "AWS"]
+    },
+    {
+        id: 8,
+        title: "CharruaDevs",
+        hook: "An SLM that talks like r/CharruaDevs",
+        country: "Uruguay",
+        category: "lab",
+        problem: "I wanted to actually understand how model training works under the hood, not just call an API. The concrete goal: take a small open model and make it talk like r/CharruaDevs, the Uruguayan dev subreddit, with its Rioplatense Spanish and its very particular opinions.",
+        timeline: "2026 • Personal fine-tuning project",
+        solution: "Fine-tuned Qwen3-4B-Instruct with QLoRA (4-bit base, LoRA rank 32, alpha 64) on ~11k real post and comment pairs scraped from the subreddit, trained entirely at home on a single RTX 4060 Ti with 8GB of VRAM. The adapters target only the attention projections and leave the MLP blocks frozen, so the model changes how it speaks without relearning what it knows. Shipped as a LoRA adapter plus GGUF on Hugging Face and the Ollama registry, in two variants: a raw one for maximum flavor and a chat one that can hold a multi-turn conversation.",
+        tags: ["QLoRA", "Unsloth", "Qwen3-4B", "PyTorch", "LoRA", "GGUF", "Ollama", "Hugging Face"]
+    },
+    {
+        id: 9,
+        title: "Gaussian Splatting",
+        hook: "My bookshelf as a navigable 3D scene",
+        country: "Uruguay",
+        category: "lab",
+        problem: "A weekend rabbit hole: turn a handful of ordinary phone photos into a 3D scene you can fly through in real time, and understand every step instead of running a black-box pipeline.",
+        timeline: "2026 • Weekend project",
+        solution: "Captured my bookshelf with normal photos, recovered every camera pose with COLMAP (Structure from Motion), then trained a scene made of millions of tiny oriented gaussians, each carrying a position, a shape, a color and an opacity. Because the rendering is differentiable, the whole thing optimizes with plain gradient descent: render from a known angle, compare against the real photo, nudge every parameter, and repeat a few thousand times. The result is navigable live, embedded right in the project.",
+        tags: ["Gaussian Splatting", "3DGS", "COLMAP", "Structure from Motion", "Differentiable Rendering", "PyTorch"]
     }
 ];
+
+// Build a rounded-rect label texture for a buoy. Pass hook='' for a name-only
+// (compact) label, or the hook string for the full name + subtitle label.
+function buildLabelTexture(THREE, title, hook) {
+    const fontSize = 120;
+    const hookFontSize = 60;
+    const lineGap = 30;
+    const padding = 60;
+    const outlineWidth = 8;
+    const cornerRadius = 35;
+
+    const measureCanvas = document.createElement('canvas');
+    const measureContext = measureCanvas.getContext('2d');
+
+    measureContext.font = `600 ${fontSize}px "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif`;
+    const titleMetrics = measureContext.measureText(title);
+    const titleWidth = titleMetrics.width;
+    const titleHeight =
+        Number.isFinite(titleMetrics.actualBoundingBoxAscent) && Number.isFinite(titleMetrics.actualBoundingBoxDescent)
+            ? titleMetrics.actualBoundingBoxAscent + titleMetrics.actualBoundingBoxDescent
+            : fontSize * 1.2;
+
+    let hookWidth = 0;
+    let hookHeight = 0;
+    if (hook) {
+        measureContext.font = `500 ${hookFontSize}px "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif`;
+        const hookMetrics = measureContext.measureText(hook);
+        hookWidth = hookMetrics.width;
+        hookHeight =
+            Number.isFinite(hookMetrics.actualBoundingBoxAscent) && Number.isFinite(hookMetrics.actualBoundingBoxDescent)
+                ? hookMetrics.actualBoundingBoxAscent + hookMetrics.actualBoundingBoxDescent
+                : hookFontSize * 1.2;
+    }
+
+    const measuredTextWidth = Math.max(titleWidth, hookWidth);
+    const measuredTextHeight = titleHeight + (hook ? lineGap + hookHeight : 0);
+
+    const bgWidth = Math.ceil(measuredTextWidth + (padding * 2) + (outlineWidth * 2));
+    const bgHeight = Math.ceil(measuredTextHeight + (padding * 2) + (outlineWidth * 2));
+
+    const maxCanvasWidth = 4096;
+    const maxCanvasHeight = 2048;
+    const devicePixelRatio = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1;
+    let dpr = Math.min(devicePixelRatio, 2);
+    dpr = Math.min(dpr, maxCanvasWidth / bgWidth, maxCanvasHeight / bgHeight);
+    dpr = Math.max(dpr, 0.5);
+
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = Math.ceil(bgWidth * dpr);
+    canvas.height = Math.ceil(bgHeight * dpr);
+
+    context.scale(dpr, dpr);
+    context.clearRect(0, 0, bgWidth, bgHeight);
+
+    // Draw rounded background rectangle
+    context.fillStyle = 'rgba(10, 10, 12, 0.62)';
+    context.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+    context.lineWidth = 2;
+
+    context.beginPath();
+    if (context.roundRect) {
+        context.roundRect(0, 0, bgWidth, bgHeight, cornerRadius);
+    } else {
+        context.moveTo(cornerRadius, 0);
+        context.arcTo(bgWidth, 0, bgWidth, cornerRadius, cornerRadius);
+        context.arcTo(bgWidth, bgHeight, bgWidth - cornerRadius, bgHeight, cornerRadius);
+        context.arcTo(0, bgHeight, 0, bgHeight - cornerRadius, cornerRadius);
+        context.arcTo(0, 0, cornerRadius, 0, cornerRadius);
+        context.closePath();
+    }
+    context.fill();
+    context.stroke();
+
+    // Draw the text (title, plus optional hook line underneath)
+    const blockTop = (bgHeight - measuredTextHeight) / 2;
+    context.save();
+    context.shadowColor = 'rgba(0, 0, 0, 0.5)';
+    context.shadowBlur = 10;
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+
+    context.font = `600 ${fontSize}px "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif`;
+    context.fillStyle = 'rgba(255, 255, 255, 0.94)';
+    context.fillText(title, bgWidth / 2, blockTop + titleHeight / 2);
+
+    if (hook) {
+        context.font = `500 ${hookFontSize}px "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif`;
+        context.fillStyle = 'rgba(255, 255, 255, 0.62)';
+        context.fillText(hook, bgWidth / 2, blockTop + titleHeight + lineGap + hookHeight / 2);
+    }
+    context.restore();
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.generateMipmaps = false; // Prevent texture blurring
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+
+    return { texture, bgWidth, bgHeight };
+}
 
 // Initialize buoy system
 export function initBuoys(scene, THREE) {
@@ -229,98 +365,48 @@ export function initBuoys(scene, THREE) {
             // Glow effect will be added dynamically when needed
             buoyGroup.add(buoyMesh);
 
+            // Idle color: lab/experiment buoys rest at a soft teal so they read
+            // as a different category at a glance; everything else stays light gray.
+            const idleColor = buoyContent[index].category === 'lab' ? 0x7fd6c2 : 0xcccccc;
+
             // Add simple monochromatic icon above buoy
             const iconGeometry = new THREE.SphereGeometry(0.8, 8, 8); // Simpler geometry
             const iconMaterial = new THREE.MeshBasicMaterial({
-                color: 0xcccccc, // Light gray for all projects initially
+                color: idleColor, // Light gray, or teal for lab projects
                 transparent: true,
                 opacity: 0.9
             });
             const icon = new THREE.Mesh(iconGeometry, iconMaterial);
             icon.position.set(0, 8, 0); // Position above buoy
 
-            // Add project title text above the icon
+            // Two label versions: compact (name only) shown at rest, and full
+            // (name + hook) swapped in when the boat gets close. Keeps the far
+            // ocean readable while the pitch appears on approach.
             const title = buoyContent[index].title;
-            const fontSize = 120;
-            const padding = 60;
-            const borderWidth = 4;
-            const outlineWidth = 8;
-            const cornerRadius = 35;
-
-            const measureCanvas = document.createElement('canvas');
-            const measureContext = measureCanvas.getContext('2d');
-            measureContext.font = `600 ${fontSize}px "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif`;
-
-            const metrics = measureContext.measureText(title);
-            const measuredTextWidth = metrics.width;
-            const measuredTextHeight =
-                Number.isFinite(metrics.actualBoundingBoxAscent) && Number.isFinite(metrics.actualBoundingBoxDescent)
-                    ? metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent
-                    : fontSize * 1.2;
-
-            const bgWidth = Math.ceil(measuredTextWidth + (padding * 2) + (outlineWidth * 2));
-            const bgHeight = Math.ceil(measuredTextHeight + (padding * 2) + (outlineWidth * 2));
-
-            const maxCanvasWidth = 4096;
-            const maxCanvasHeight = 2048;
-            const devicePixelRatio = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1;
-            let dpr = Math.min(devicePixelRatio, 2);
-            dpr = Math.min(dpr, maxCanvasWidth / bgWidth, maxCanvasHeight / bgHeight);
-            dpr = Math.max(dpr, 0.5);
-
-            const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = Math.ceil(bgWidth * dpr);
-            canvas.height = Math.ceil(bgHeight * dpr);
-
-            context.scale(dpr, dpr);
-            context.clearRect(0, 0, bgWidth, bgHeight);
-
-            context.font = `600 ${fontSize}px "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif`;
-            context.textAlign = 'center';
-            context.textBaseline = 'middle';
-
-            // Draw rounded background rectangle
-            context.fillStyle = 'rgba(10, 10, 12, 0.62)';
-            context.strokeStyle = 'rgba(255, 255, 255, 0.16)';
-            context.lineWidth = 2;
-
-            context.beginPath();
-            if (context.roundRect) {
-                context.roundRect(0, 0, bgWidth, bgHeight, cornerRadius);
-            } else {
-                context.moveTo(cornerRadius, 0);
-                context.arcTo(bgWidth, 0, bgWidth, cornerRadius, cornerRadius);
-                context.arcTo(bgWidth, bgHeight, bgWidth - cornerRadius, bgHeight, cornerRadius);
-                context.arcTo(0, bgHeight, 0, bgHeight - cornerRadius, cornerRadius);
-                context.arcTo(0, 0, cornerRadius, 0, cornerRadius);
-                context.closePath();
-            }
-            context.fill();
-            context.stroke();
-
-            // Draw the text
-            context.save();
-            context.shadowColor = 'rgba(0, 0, 0, 0.5)';
-            context.shadowBlur = 10;
-            context.fillStyle = 'rgba(255, 255, 255, 0.94)';
-            context.fillText(title, bgWidth / 2, bgHeight / 2);
-            context.restore();
-
-            const textTexture = new THREE.CanvasTexture(canvas);
-            textTexture.generateMipmaps = false; // Prevent texture blurring
-            textTexture.minFilter = THREE.LinearFilter;
-            textTexture.magFilter = THREE.LinearFilter;
-
-            const textMaterial = new THREE.SpriteMaterial({
-                map: textTexture,
-                transparent: true,
-                opacity: 1.0  // Fully opaque for better visibility
-            });
-            const textSprite = new THREE.Sprite(textMaterial);
+            const hook = buoyContent[index].hook || '';
             const pixelsPerWorldUnitX = 1836 / 18;
             const pixelsPerWorldUnitY = 384 / 4.5;
-            textSprite.scale.set(bgWidth / pixelsPerWorldUnitX, bgHeight / pixelsPerWorldUnitY, 1);
+
+            const compactLabel = buildLabelTexture(THREE, title, '');
+            const fullLabel = hook ? buildLabelTexture(THREE, title, hook) : compactLabel;
+
+            const labelCompact = {
+                map: compactLabel.texture,
+                scale: new THREE.Vector2(compactLabel.bgWidth / pixelsPerWorldUnitX, compactLabel.bgHeight / pixelsPerWorldUnitY)
+            };
+            const labelFull = {
+                map: fullLabel.texture,
+                scale: new THREE.Vector2(fullLabel.bgWidth / pixelsPerWorldUnitX, fullLabel.bgHeight / pixelsPerWorldUnitY)
+            };
+
+            const textMaterial = new THREE.SpriteMaterial({
+                map: labelCompact.map,
+                transparent: true,
+                opacity: 1.0,  // Fully opaque for better visibility
+                color: idleColor  // Matches the icon's resting color (teal for lab buoys)
+            });
+            const textSprite = new THREE.Sprite(textMaterial);
+            textSprite.scale.set(labelCompact.scale.x, labelCompact.scale.y, 1);
             textSprite.position.set(0, 15, 0); // Position even higher above icon
 
             buoyGroup.add(textSprite);
@@ -355,10 +441,14 @@ export function initBuoys(scene, THREE) {
                 originalScale: buoyMesh.scale.clone(),
                 content: buoyContent[index],
                 state: 'idle', // idle, highlighted, visited
+                idleColor: idleColor, // resting icon/text color (teal for lab buoys)
                 glow: null, // Will be created dynamically
                 buoyMesh: buoyMesh,
                 icon: icon,
                 textSprite: textSprite,
+                labelCompact: labelCompact, // name-only label (far / at rest)
+                labelFull: labelFull,       // name + hook label (on approach)
+                labelExpanded: false,       // which label is currently shown
                 interactionRing: null, // Will be created for interaction feedback
                 isGLB: true
             };
@@ -438,6 +528,20 @@ function createFallbackBuoys(scene, THREE) {
 }
 
 // Update buoy positions and interactions
+// Swap a buoy's label between compact (name only) and full (name + hook).
+// Only touches the sprite when the state actually changes, so it is cheap to
+// call every frame.
+function setLabelExpanded(buoy, expanded) {
+    if (buoy.userData.labelExpanded === expanded) return;
+    const target = expanded ? buoy.userData.labelFull : buoy.userData.labelCompact;
+    if (!target) return;
+    buoy.userData.labelExpanded = expanded;
+    const sprite = buoy.userData.textSprite;
+    sprite.material.map = target.map;
+    sprite.material.needsUpdate = true;
+    sprite.scale.set(target.scale.x, target.scale.y, 1);
+}
+
 export function updateBuoys(time, boatPosition, THREE, scene) {
     buoys.forEach((buoy, index) => {
         // Update buoy position based on waves
@@ -518,9 +622,12 @@ function updateBuoyState(buoy, distance, THREE) {
                 startPulseAnimation(buoy.userData.icon);
             }
         }
+        // Close enough: reveal the name + hook label
+        setLabelExpanded(buoy, true);
         currentHighlightedBuoy = buoy;
     } else {
-        // Outside interaction range
+        // Outside interaction range: show the compact name-only label
+        setLabelExpanded(buoy, false);
         if (buoy.userData.state === 'visited') {
             // Visited buoy - keep golden glow but more subtle
             if (!glow) {
@@ -547,12 +654,12 @@ function updateBuoyState(buoy, distance, THREE) {
             }
             if (buoy.userData.state !== 'idle') {
                 buoy.userData.state = 'idle';
-                // Animate back to default light gray
-                animateBuoyColor(buoy.userData.icon, 0xcccccc, 600);
+                // Animate back to this buoy's resting color (teal for lab buoys)
+                animateBuoyColor(buoy.userData.icon, buoy.userData.idleColor, 600);
                 animateBuoyScale(buoy.userData.icon, 1.0, 500);
 
-                // Reset text sprite color to light gray
-                buoy.userData.textSprite.material.color.setHex(0xcccccc);
+                // Reset text sprite color to the resting color
+                buoy.userData.textSprite.material.color.setHex(buoy.userData.idleColor);
 
                 // Remove interaction ring
                 removeInteractionRing(buoy);
